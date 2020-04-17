@@ -5,7 +5,7 @@ HKJC repo is a project fro analyzing the horse racing data from [HKJC](https://b
 ## Contents
 * [Prerequisites](#Prerequisites)
 * [Installing](#Installing)
-* [Crawler][#Crawler]
+* [Crawler](#Crawler)
 
 ## Prerequisites
 1. Download [Miniconda3](https://docs.conda.io/en/latest/miniconda.html)
