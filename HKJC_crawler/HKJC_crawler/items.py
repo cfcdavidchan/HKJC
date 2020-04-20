@@ -6,14 +6,13 @@
 # https://doc.scrapy.org/en/latest/topics/items.html
 
 import scrapy
+from scrapy_djangoitem import DjangoItem
+from HKJC_database.models import Going, RacingCourse, Jockey
 
-
-class HkjcCrawlerItem(scrapy.Item):
+class HkjcCrawlerItem(DjangoItem):
     # define the fields for your item here like:
-    # name = scrapy.Field()
-    horse_name = scrapy.Field()
-    weight = scrapy.Field()
-    jockey = scrapy.Field()
-    trainer = scrapy.Field()
-    crawl_time = scrapy.Field()
+    going = Jockey
     pass
+
+class JockeyItem(DjangoItem):
+    django_model = Jockey
