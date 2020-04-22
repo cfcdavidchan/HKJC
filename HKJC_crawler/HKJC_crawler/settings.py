@@ -66,6 +66,7 @@ COOKIES_ENABLED = False
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     'HKJC_crawler.pipelines.JockeysCrawlerPipeline': 300,
+    'HKJC_crawler.pipelines.CourseCrawlerPipeline':300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -106,9 +107,3 @@ django.setup()
 
 ## Rest of settings are below ...
 
-SPLASH_URL = 'http://192.168.59.103:8050'
-DOWNLOADER_MIDDLEWARES = {
-    'scrapy_splash.SplashCookiesMiddleware': 723,
-    'scrapy_splash.SplashMiddleware': 725,
-    'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
-}

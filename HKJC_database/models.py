@@ -38,11 +38,12 @@ class RacingCourse(models.Model):
                              blank= True,
                              help_text='Enter the course of the track')
 
-    home_straight_M = models.PositiveIntegerField(blank= True,
-                                                  help_text='Enter the condition code')
+    home_straight_M = models.FloatField(help_text= 'Enter the Home Straight(M)'
+                                        )
 
-    width_M = models.DecimalField(max_digits=10,
-                                  decimal_places=10)
+    width_M = models.FloatField(help_text= 'Enter the Width(M)'
+                                )
+
     def __str__(self):
         """String for representing the MyModelName object (in Admin site etc.)."""
         return self.name
@@ -63,3 +64,38 @@ class Jockey(models.Model):
                              blank= False,
                              help_text="Enter the jockey's hkjc id")
 
+    stakes_won = models.FloatField(help_text= 'Enter the stakes Stakes won'
+                                )
+
+    wins_past_10_racing = models.PositiveSmallIntegerField(help_text= 'Enter the No. of Wins in past 10 race days'
+                                )
+
+    avg_JKC_past_10 = models.FloatField(help_text= 'Avg. JKC points in Past 10 race days'
+                                )
+
+    number_win = models.IntegerField(help_text= 'No. of Wins'
+                                     )
+
+    number_second = models.IntegerField(help_text= 'No. of 2nds'
+                                     )
+
+    number_third = models.IntegerField(help_text= 'No. of 3rds'
+                                     )
+
+    number_fourth = models.IntegerField(help_text= 'No. of 4ths'
+                                     )
+
+    total_rides = models.IntegerField(help_text= 'Total Rides'
+                                     )
+
+    win_rate = models.FloatField(help_text= 'Win %'
+                                )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        """String for representing the MyModelName object (in Admin site etc.)."""
+        return self.name
+
+    class Meta:
+        ordering = ['number_win']

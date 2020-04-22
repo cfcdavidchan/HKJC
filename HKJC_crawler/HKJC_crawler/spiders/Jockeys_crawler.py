@@ -3,7 +3,7 @@ import scrapy
 import time
 import requests
 from bs4 import BeautifulSoup
-
+import re
 
 class JockeysSpider(scrapy.Spider):
     name = 'Jockeys_crawler'
@@ -45,11 +45,71 @@ class JockeysSpider(scrapy.Spider):
             chi_name = (chinese_soup.find('div', attrs={'class': "nav f_fs13"}).find('p', attrs={'class': "tit"})).text.strip()
         except:
             chi_name = None
+        try:
+            number_win = response.xpath('//tr/td[text()="No. of Wins"]/following-sibling::td/text()').extract_first()
+            number_win = int(re.sub("\D","", number_win))
+        except:
+            number_win = 0
+        try:
+            number_second = response.xpath('//tr/td[text()="No. of 2nds"]/following-sibling::td/text()').extract_first()
+            number_second = int(re.sub("\D", "", number_second))
+        except:
+            number_second = 0
 
-        # print the result
+        try:
+            number_third = response.xpath('//tr/td[text()="No. of 3rds"]/following-sibling::td/text()').extract_first()
+            number_third = int(re.sub("\D", "", number_third))
+        except:
+            number_third = 0
+
+        try:
+            number_fourth = response.xpath('//tr/td[text()="No. of 4ths"]/following-sibling::td/text()').extract_first()
+            number_fourth = int(re.sub("\D", "", number_fourth))
+        except:
+            number_fourth = 0
+
+        try:
+            total_rides = response.xpath('//tr/td[text()="Total Rides"]/following-sibling::td/text()').extract_first()
+            total_rides = int(re.sub("\D","", total_rides))
+        except:
+            total_rides = 0
+
+        try:
+            win_rate = response.xpath('//tr/td[text()="Win %"]/following-sibling::td/text()').extract_first()
+            win_rate = float(win_rate.replace(':','').replace('%', ''))
+        except:
+            win_rate = 0
+
+        try:
+            stakes_won = response.xpath('//tr/td[text()="Stakes won"]/following-sibling::td/text()').extract_first()
+            stakes_won = float(stakes_won.replace(':','').replace(',', '').replace('$', ''))
+        except:
+            stakes_won = 0
+
+        try:
+            wins_past_10_racing = response.xpath('//tr/td[text()="No. of Wins in past 10 race days"]/following-sibling::td/text()').extract_first()
+            wins_past_10_racing = int(re.sub("\D", "", wins_past_10_racing))
+        except:
+            wins_past_10_racing = 0
+
+        try:
+            avg_JKC_past_10 = response.xpath('//tr/td[text()="Avg. JKC points in Past 10 race days "]/following-sibling::td/text()').extract_first()
+            avg_JKC_past_10 = float(avg_JKC_past_10.replace(':','').replace(',', '').replace('$', ''))
+        except:
+            avg_JKC_past_10 = 0
+
         item = JockeyItem()
         item['name'] = eng_name
         item['chinese_name'] = chi_name
         item['hkjc_id'] = hkjc_id
+        item['stakes_won'] = stakes_won
+        item['wins_past_10_racing'] = wins_past_10_racing
+        item['avg_JKC_past_10'] = avg_JKC_past_10
+        item['number_win'] = number_win
+        item['number_second'] = number_second
+        item['number_third'] = number_third
+        item['number_fourth'] = number_fourth
+        item['total_rides'] = total_rides
+        item['win_rate'] = win_rate
 
         yield item

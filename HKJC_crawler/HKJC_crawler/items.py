@@ -7,12 +7,16 @@
 
 import scrapy
 from scrapy_djangoitem import DjangoItem
-from HKJC_database.models import Going, RacingCourse, Jockey
+from HKJC_database.models import RacingCourse, Jockey
 
 class HkjcCrawlerItem(DjangoItem):
     # define the fields for your item here like:
-    going = Jockey
     pass
 
 class JockeyItem(DjangoItem):
     django_model = Jockey
+    pass
+
+class CourseItem(DjangoItem):
+    django_model = RacingCourse
+
