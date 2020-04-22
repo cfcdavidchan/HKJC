@@ -1,28 +1,28 @@
-from HKJC_crawler.items import JockeyInfoItem, JockeyReportItem
+from HKJC_crawler.items import TrainerInfoItem, TrainerReportItem
 import scrapy
 import time
 import requests
 from bs4 import BeautifulSoup
 import re
 
-class JockeysSpider(scrapy.Spider):
-    name = 'Jockeys_crawler'
+class TrainerSpider(scrapy.Spider):
+    name = 'Trainer_crawler'
     #allowed_domains = ['racing.hkjc.com']
-    start_urls = ['https://racing.hkjc.com/racing/information/English/Jockey/JockeyRanking.aspx/']
+    start_urls = ['https://racing.hkjc.com/racing/information/English/Trainers/TrainerRanking.aspx/']
 
     def parse(self, response):
         url = self.start_urls[0]
-        all_jockeys = response.xpath('//td[@class= "f_fs14 f_tal"]/a/@href').extract()
+        all_trainers = response.xpath('//td[@class= "f_fs14 f_tal"]/a/@href').extract()
         print ('start')
-        print (all_jockeys)
-        print (len(all_jockeys))
+        print (all_trainers)
+        print (len(all_trainers))
 
-        for jockey in all_jockeys:
-            aspx_position = jockey.find('aspx') + len('aspx')
-            jockey = jockey[:aspx_position] + '/' + jockey[aspx_position:]
+        for trainer in all_trainers:
+            aspx_position = trainer.find('aspx') + len('aspx')
+            trainer = trainer[:aspx_position] + '/' + trainer[aspx_position:]
             time.sleep(1)
-            jockey_url = 'https://racing.hkjc.com' + jockey
-            yield scrapy.Request(jockey_url, callback=self.parse_content)
+            trainer_url = 'https://racing.hkjc.com' + trainer
+            yield scrapy.Request(trainer_url, callback=self.parse_content)
 
     def parse_content(self, response):
         # Get the url of the request
@@ -33,7 +33,7 @@ class JockeysSpider(scrapy.Spider):
         hkjc_id = url[hkjc_id_start: hkjc_id_end]
         # Get english name
         try:
-            eng_name = response.xpath('//div[@style= "font-size:95%"]').xpath('p[@class= "tit"]/text()').extract_first()
+            eng_name = response.xpath('//div[@class= "nav f_fs13"]').xpath('p[@class= "tit"]/text()').extract_first()
             eng_name = eng_name.strip().rstrip()
         except:
             eng_name = None
@@ -69,10 +69,10 @@ class JockeysSpider(scrapy.Spider):
             number_fourth = 0
 
         try:
-            total_rides = response.xpath('//tr/td[text()="Total Rides"]/following-sibling::td/text()').extract_first()
-            total_rides = int(re.sub("\D","", total_rides))
+            total_runners = response.xpath('//tr/td[text()="Total Runners"]/following-sibling::td/text()').extract_first()
+            total_runners = int(re.sub("\D","", total_runners))
         except:
-            total_rides = 0
+            total_runners = 0
 
         try:
             win_rate = response.xpath('//tr/td[text()="Win %"]/following-sibling::td/text()').extract_first()
@@ -92,27 +92,23 @@ class JockeysSpider(scrapy.Spider):
         except:
             wins_past_10_racing = 0
 
-        try:
-            avg_JKC_past_10 = response.xpath('//tr/td[text()="Avg. JKC points in Past 10 race days "]/following-sibling::td/text()').extract_first()
-            avg_JKC_past_10 = float(avg_JKC_past_10.replace(':','').replace(',', '').replace('$', ''))
-        except:
-            avg_JKC_past_10 = 0
+        #print (eng_name)
+        #print(chi_name)
+        TrainerInfo_item = TrainerInfoItem()
+        TrainerInfo_item['name'] = eng_name
+        TrainerInfo_item['chinese_name'] = chi_name
+        TrainerInfo_item['hkjc_id'] = hkjc_id
+        yield TrainerInfo_item
 
-        JockeyInfo_item = JockeyInfoItem() #store Jockey Info
-        JockeyInfo_item['name'] = eng_name
-        JockeyInfo_item['chinese_name'] = chi_name
-        JockeyInfo_item['hkjc_id'] = hkjc_id
-        yield JockeyInfo_item
+        TrainerReport_item = TrainerReportItem()
+        TrainerReport_item['trainer'] = eng_name
+        TrainerReport_item['stakes_won'] = stakes_won
+        TrainerReport_item['wins_past_10_racing'] = wins_past_10_racing
+        TrainerReport_item['number_win'] = number_win
+        TrainerReport_item['number_second'] = number_second
+        TrainerReport_item['number_third'] = number_third
+        TrainerReport_item['number_fourth'] = number_fourth
+        TrainerReport_item['total_runners'] = total_runners
+        TrainerReport_item['win_rate'] = win_rate
 
-        JockeyReport_item = JockeyReportItem() #store Jockey Report db
-        JockeyReport_item['jockey'] = eng_name
-        JockeyReport_item['stakes_won'] = stakes_won
-        JockeyReport_item['wins_past_10_racing'] = wins_past_10_racing
-        JockeyReport_item['avg_JKC_past_10'] = avg_JKC_past_10
-        JockeyReport_item['number_win'] = number_win
-        JockeyReport_item['number_second'] = number_second
-        JockeyReport_item['number_third'] = number_third
-        JockeyReport_item['number_fourth'] = number_fourth
-        JockeyReport_item['total_rides'] = total_rides
-        JockeyReport_item['win_rate'] = win_rate
-        yield JockeyReport_item
+        yield TrainerReport_item

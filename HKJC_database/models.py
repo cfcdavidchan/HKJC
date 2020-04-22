@@ -51,7 +51,7 @@ class RacingCourse(models.Model):
     class Meta:
         ordering = ['course']
 
-class Jockey(models.Model):
+class Jockey_Info(models.Model):
     name = models.CharField(max_length=50,
                              blank=False,
                              help_text="Enter the jockey's name")
@@ -63,6 +63,19 @@ class Jockey(models.Model):
     hkjc_id = models.CharField(max_length= 10,
                              blank= False,
                              help_text="Enter the jockey's hkjc id")
+    def __str__(self):
+        """String for representing the MyModelName object (in Admin site etc.)."""
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+
+class Jockey_Report(models.Model):
+    jockey = models.ForeignKey(Jockey_Info,
+                               related_name= 'Jockey_Info',
+                               on_delete= models.SET_NULL,
+                               null= True
+                               )
 
     stakes_won = models.FloatField(help_text= 'Enter the stakes Stakes won'
                                 )
@@ -93,9 +106,62 @@ class Jockey(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['number_win']
+
+class Trainer_Info(models.Model):
+    name = models.CharField(max_length=50,
+                             blank=False,
+                             help_text="Enter the Trainer's name")
+
+    chinese_name = models.CharField(max_length=50,
+                                     blank=True,
+                                     help_text="Enter the Trainer's chinese name")
+
+    hkjc_id = models.CharField(max_length= 10,
+                             blank= False,
+                             help_text="Enter the jockey's hkjc id")
+
     def __str__(self):
         """String for representing the MyModelName object (in Admin site etc.)."""
         return self.name
+
+    class Meta:
+        ordering = ['name']
+
+
+class Trainer_Report(models.Model):
+    trainer = models.ForeignKey(Trainer_Info,
+                               related_name= 'Trainer_Info',
+                               on_delete= models.SET_NULL,
+                               null= True
+                               )
+
+    stakes_won = models.FloatField(help_text= 'Enter the stakes Stakes won'
+                                )
+
+    wins_past_10_racing = models.PositiveSmallIntegerField(help_text= 'Enter the No. of Wins in past 10 race days'
+                                )
+
+    number_win = models.IntegerField(help_text= 'No. of Wins'
+                                     )
+
+    number_second = models.IntegerField(help_text= 'No. of 2nds'
+                                     )
+
+    number_third = models.IntegerField(help_text= 'No. of 3rds'
+                                     )
+
+    number_fourth = models.IntegerField(help_text= 'No. of 4ths'
+                                     )
+
+    total_runners = models.IntegerField(help_text= 'Total Runners'
+                                     )
+
+    win_rate = models.FloatField(help_text= 'Win %'
+                                )
+
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['number_win']

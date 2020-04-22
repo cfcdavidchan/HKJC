@@ -66,7 +66,8 @@ COOKIES_ENABLED = False
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     'HKJC_crawler.pipelines.JockeysCrawlerPipeline': 300,
-    'HKJC_crawler.pipelines.CourseCrawlerPipeline':300,
+    'HKJC_crawler.pipelines.CoursesCrawlerPipeline':300,
+    'HKJC_crawler.pipelines.TrainersCrawlerPipeline':300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
