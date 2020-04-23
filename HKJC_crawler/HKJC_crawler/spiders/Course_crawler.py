@@ -4,7 +4,6 @@ from scrapy.selector import Selector
 from .helper.helper import get_chrome_path
 #from HKJC_database.models import Going, RacingCourse
 from HKJC_crawler.items import CourseItem
-from decimal import Decimal
 from bs4 import BeautifulSoup
 import sys
 

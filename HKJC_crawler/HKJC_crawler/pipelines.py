@@ -4,8 +4,8 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-from .items import JockeyInfoItem, JockeyReportItem, CourseItem, TrainerInfoItem, TrainerReportItem
-from HKJC_database.models import Jockey_Info, RacingCourse, Jockey_Report, Trainer_Info, Trainer_Report
+from .items import JockeyInfoItem, JockeyReportItem, CourseItem, TrainerInfoItem, TrainerReportItem, HorseInfoItem, HorseReportItem, HorseRankingItem
+from HKJC_database.models import Jockey_Info, RacingCourse, Jockey_Report, Trainer_Info, Trainer_Report, Horse_Info, Horse_Report, Horse_Ranking
 
 class JockeysCrawlerPipeline(object):
     def process_item(self, item, spider):
@@ -51,7 +51,7 @@ class CoursesCrawlerPipeline(object):
                                                        width_M= item['width_M'],
                                                        )
             if not Course_exist:  # save the jockey if it is not in the db
-                #item.save()
+                item.save()
                 pass
             else: # not save if it is exists
                 pass
@@ -90,4 +90,48 @@ class TrainersCrawlerPipeline(object):
             except Trainer_Report.DoesNotExist: # save it if any amount is changed/ not exists
                 print ('Save Data:')
                 TrainerReport_item.save()
+        return item
+
+
+class HorseCrawlerPipeline(object):
+    def process_item(self, item, spider):
+        if isinstance(item, HorseInfoItem):
+            trainer = Trainer_Info.objects.get(hkjc_id=item['trainer'])  # get the foregin key from Jockey_info
+            item['trainer'] = trainer
+            try:  # check whether the horse data exists data exists in Horse_Info
+                Horse_Info_data = Horse_Info.objects.get(name=item['name'])
+                # if it is exists, update it
+                HorseInfo_Item = item.save(commit=False)
+                HorseInfo_Item.id = Horse_Info_data.id
+                HorseInfo_Item.save()
+            except Horse_Info.DoesNotExist: #save it if any amount is changed/ not exists
+                print ('Save Data:')
+                item.save()
+
+        if isinstance(item, HorseRankingItem):
+            horse = Horse_Info.objects.get(hkjc_id=item['horse'])
+            item['horse'] = horse
+            try: #check whether the horse ranking exists data exists in Horse_Ranking
+                ranking_data = Horse_Ranking.objects.get(horse= item['horse'],
+                                                      rank= item['rank'],
+                                                      rank_reord_date= item['rank_reord_date']
+                                                      )
+            except Horse_Ranking.DoesNotExist:#save it if the field not exist
+                print ('Save Data:')
+                item.save()
+
+        if isinstance(item, HorseReportItem):
+            horse = Horse_Info.objects.get(hkjc_id=item['horse'])
+            item['horse'] = horse
+            try: #check whether the horse ranking exists data exists in Horse_Ranking
+                HorseReport_data = Horse_Report.objects.get(horse= item['horse'],
+                                                            current_rank= item['current_rank'],
+                                                            season_start_rank= item['season_start_rank'],
+                                                            season_stakes= item['season_stakes'],
+                                                            total_stakes= item['total_stakes']
+                                                            )
+            except Horse_Report.DoesNotExist:#save it if the field not exist
+                print ('Save Data:')
+                item.save()
+
         return item

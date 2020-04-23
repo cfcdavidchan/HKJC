@@ -1,7 +1,7 @@
 import os, sys
 
 base_path = sys.path[0] # obtain the path of this directory
-project_path = os.path.abspath(os.path.join(base_path, '../../'))
+project_path = os.path.abspath(os.path.join(base_path, '../'))
 sys.path.append(project_path)
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE','HKJC.settings')

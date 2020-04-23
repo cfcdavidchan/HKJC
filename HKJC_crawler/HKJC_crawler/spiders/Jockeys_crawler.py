@@ -34,7 +34,7 @@ class JockeysSpider(scrapy.Spider):
         # Get english name
         try:
             eng_name = response.xpath('//div[@style= "font-size:95%"]').xpath('p[@class= "tit"]/text()').extract_first()
-            eng_name = eng_name.strip().rstrip()
+            eng_name = eng_name.strip().strip()
         except:
             eng_name = None
         # Get the Chinese name

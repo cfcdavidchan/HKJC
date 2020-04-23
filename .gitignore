@@ -6,3 +6,5 @@ __pycache__/
 __pycache__
 !.gitkeep
 tmp.py
+./HKJC_database/migrations/
+!./HKJC_database/migrations/__init__.py

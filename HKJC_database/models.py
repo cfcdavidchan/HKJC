@@ -1,5 +1,4 @@
 from django.db import models
-
 # Create your models here.
 class Going(models.Model):
     track = models.CharField(max_length= 50,
@@ -18,9 +17,11 @@ class Going(models.Model):
                              blank= False,
                              help_text='Enter the condition code')
 
+    modified_date = models.DateTimeField(auto_now=True)
+
     def __str__(self):
         """String for representing the MyModelName object (in Admin site etc.)."""
-        return self.name
+        return self.track
 
     class Meta:
         ordering = ['track']
@@ -44,12 +45,14 @@ class RacingCourse(models.Model):
     width_M = models.FloatField(help_text= 'Enter the Width(M)'
                                 )
 
+    modified_date = models.DateTimeField(auto_now=True)
+
     def __str__(self):
         """String for representing the MyModelName object (in Admin site etc.)."""
-        return self.name
+        return self.place
 
     class Meta:
-        ordering = ['course']
+        ordering = ['place']
 
 class Jockey_Info(models.Model):
     name = models.CharField(max_length=50,
@@ -63,6 +66,8 @@ class Jockey_Info(models.Model):
     hkjc_id = models.CharField(max_length= 10,
                              blank= False,
                              help_text="Enter the jockey's hkjc id")
+
+    modified_date = models.DateTimeField(auto_now=True)
     def __str__(self):
         """String for representing the MyModelName object (in Admin site etc.)."""
         return self.name
@@ -72,7 +77,7 @@ class Jockey_Info(models.Model):
 
 class Jockey_Report(models.Model):
     jockey = models.ForeignKey(Jockey_Info,
-                               related_name= 'Jockey_Info',
+                               related_name= 'jockey_Info_jockey',
                                on_delete= models.SET_NULL,
                                null= True
                                )
@@ -122,6 +127,8 @@ class Trainer_Info(models.Model):
                              blank= False,
                              help_text="Enter the jockey's hkjc id")
 
+    modified_date = models.DateTimeField(auto_now=True)
+
     def __str__(self):
         """String for representing the MyModelName object (in Admin site etc.)."""
         return self.name
@@ -129,10 +136,9 @@ class Trainer_Info(models.Model):
     class Meta:
         ordering = ['name']
 
-
 class Trainer_Report(models.Model):
     trainer = models.ForeignKey(Trainer_Info,
-                               related_name= 'Trainer_Info',
+                               related_name= 'trainer_report_Trainer',
                                on_delete= models.SET_NULL,
                                null= True
                                )
@@ -165,3 +171,96 @@ class Trainer_Report(models.Model):
 
     class Meta:
         ordering = ['number_win']
+
+class Horse_Info(models.Model):
+    name = models.CharField(max_length=50,
+                             blank=False,
+                             help_text="Enter the horse's name")
+
+    chinese_name = models.CharField(max_length=50,
+                                     blank=True,
+                                     help_text="Enter the horse's chinese name")
+
+    hkjc_id = models.CharField(max_length= 20,
+                             blank= False,
+                             help_text="Enter the horse's hkjc id")
+
+    origin = models.CharField(max_length= 50,
+                             blank= False,
+                             help_text="Enter the horse's origin")
+
+    age = models.IntegerField(help_text= "Enter the horse's age"
+                              )
+
+    trainer = models.ForeignKey(Trainer_Info,
+                               related_name= 'horse_info_trainer',
+                               on_delete= models.SET_NULL,
+                               null= True
+                               )
+
+    owner = models.CharField(max_length= 100,
+                             blank= False,
+                             help_text="Enter the horse's owner")
+
+    sire = models.CharField(max_length= 100,
+                             blank= False,
+                             help_text="Enter the horse's sire")
+
+    dam = models.CharField(max_length= 100,
+                             blank= False,
+                             help_text="Enter the horse's dam")
+
+    dam_sire = models.CharField(max_length= 100,
+                                           blank= True,
+                                           help_text="Enter the horse's dam_sire"
+                                )
+
+    modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        """String for representing the MyModelName object (in Admin site etc.)."""
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+
+class Horse_Report(models.Model):
+    horse = models.ForeignKey('Horse_info',
+                               related_name= 'horse_info_horse',
+                               on_delete= models.SET_NULL,
+                               null= True
+                               )
+
+    current_rank = models.IntegerField(help_text="Enter the horse's current_rank"
+                                       )
+
+    season_start_rank = models.IntegerField(help_text="Enter the horse's starting rank of this season"
+                                            )
+
+    season_stakes = models.FloatField(help_text="Enter the horse's season stakes"
+                                      )
+
+    total_stakes = models.FloatField(help_text= "Enter the horse's total stakes"
+                              )
+
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['horse']
+
+class Horse_Ranking(models.Model):
+    horse = models.ForeignKey(Horse_Info,
+                               related_name= 'horse_ranking_horse',
+                               on_delete= models.SET_NULL,
+                               null= True
+                               )
+
+    rank = models.IntegerField(help_text="Enter the horse's rank"
+                               )
+
+    rank_reord_date = models.DateField(help_text="Enter the record date of the rank"
+                                       )
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['horse']
