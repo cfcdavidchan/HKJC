@@ -264,3 +264,91 @@ class Horse_Ranking(models.Model):
 
     class Meta:
         ordering = ['horse']
+
+class Match_Info(models.Model):
+    match_date = models.DateField(help_text="Enter the Match Date"
+                                  )
+
+    match_place = models.CharField(max_length= 50,
+                                   help_text= 'Enter the place of the match'
+                                   )
+
+    race_number = models.IntegerField(help_text="Enter the race number"
+                                      )
+
+    distance_M = models.IntegerField(help_text="Enter the match distance (M)"
+                                     )
+
+    match_class = models.CharField(max_length= 10,
+                                   help_text= "Enter the match class"
+                                   )
+
+    match_name = models.CharField(max_length= 50,
+                                  help_text= "Enter the match name"
+                                  )
+
+    match_prize = models.FloatField(help_text="Enter the match prize"
+                                    )
+
+    match_going = models.CharField(max_length= 50,
+                                   help_text= 'Enter the going of the match'
+                                   )
+    match_course = models.CharField(max_length= 50,
+                                    help_text= 'Enter the course of the match'
+                                    )
+
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['match_date', 'race_number']
+
+class Match_Result(models.Model):
+    match = models.ForeignKey(Match_Info,
+                              related_name= 'match',
+                              on_delete= models.SET_NULL,
+                              null= True
+                              )
+
+    horse_place = models.CharField(max_length= 10,
+                                   help_text= "Enter the horse place"
+                                   )
+
+    horse_no = models.IntegerField(help_text="Enter the horse number",
+                                   blank=True,
+                                   null=True
+                                   )
+
+    horse = models.ForeignKey(Horse_Info,
+                              related_name= 'match_horse',
+                              on_delete= models.SET_NULL,
+                              null= True
+                              )
+
+    jockey = models.ForeignKey(Jockey_Info,
+                              related_name= 'match_horse',
+                              on_delete= models.SET_NULL,
+                              null= True
+                              )
+
+    actual_weight = models.IntegerField(help_text="Enter actual weight of the horse",
+                                        blank=True,
+                                        null=True
+                                        )
+
+    declar_weight = models.IntegerField(help_text="Enter actual weight of the horse",
+                                        blank=True,
+                                        null=True
+                                        )
+
+    draw = models.IntegerField(help_text="Enter draw of the horse",
+                               )
+
+    finish_time = models.CharField(max_length= 50,
+                                   help_text= "Enter the finish time"
+                                   )
+
+    win_odds = models.FloatField(help_text="Enter the win odds"
+                                 )
+
+    created_date = models.DateTimeField(auto_now_add=True)
+

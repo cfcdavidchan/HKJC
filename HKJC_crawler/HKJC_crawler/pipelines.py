@@ -4,8 +4,8 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-from .items import JockeyInfoItem, JockeyReportItem, CourseItem, TrainerInfoItem, TrainerReportItem, HorseInfoItem, HorseReportItem, HorseRankingItem
-from HKJC_database.models import Jockey_Info, RacingCourse, Jockey_Report, Trainer_Info, Trainer_Report, Horse_Info, Horse_Report, Horse_Ranking
+from .items import JockeyInfoItem, JockeyReportItem, CourseItem, TrainerInfoItem, TrainerReportItem, HorseInfoItem, HorseReportItem, HorseRankingItem, MatchInfoItem, MatchResultItem
+from HKJC_database.models import Jockey_Info, RacingCourse, Jockey_Report, Trainer_Info, Trainer_Report, Horse_Info, Horse_Report, Horse_Ranking, Match_Info, Match_Result
 
 class JockeysCrawlerPipeline(object):
     def process_item(self, item, spider):
@@ -134,4 +134,32 @@ class HorseCrawlerPipeline(object):
                 print ('Save Data:')
                 item.save()
 
+        return item
+
+class MatchCrawlerPipeline(object):
+    def process_item(self, item, spider):
+        if isinstance(item, MatchInfoItem):
+            try:# check whether the
+                match = Match_Info.objects.get(match_date= item['match_date'],
+                                               race_number= item['race_number'])
+            except Match_Info.DoesNotExist: # save the jockey info if it is not in the db
+                item.save()
+                pass
+
+        if isinstance(item, MatchResultItem):
+            try:  # check whether the
+                match_result = Match_Result.objects.get(match= item['match'],
+                                                        horse= item['horse'],
+                                                        actual_weight= item['actual_weight'],
+                                                        declar_weight= item['declar_weight'],
+                                                        draw= item['draw'],
+                                                        finish_time= item['finish_time'],
+                                                        horse_no= item['horse_no'],
+                                                        horse_place= item['horse_place'],
+                                                        jockey= item['jockey'],
+                                                        win_odds= item['win_odds']
+                                                        )
+
+            except Match_Result.DoesNotExist: # save it if any amount is changed/ not exists
+                item.save()
         return item

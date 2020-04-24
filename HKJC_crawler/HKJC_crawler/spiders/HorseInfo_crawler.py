@@ -4,7 +4,6 @@ from HKJC_crawler.items import HorseInfoItem, HorseReportItem, HorseRankingItem
 from bs4 import BeautifulSoup
 import requests
 from datetime import datetime
-import sys
 
 class HorseCrawler(scrapy.Spider):
 
