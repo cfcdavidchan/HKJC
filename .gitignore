@@ -9,3 +9,5 @@ __pycache__
 !/HKJC_database/migrations/__init__.py
 tmp.py
 tmp2.py
+recent_match.csv
+*.csv#

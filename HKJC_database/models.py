@@ -279,21 +279,21 @@ class Match_Info(models.Model):
     distance_M = models.IntegerField(help_text="Enter the match distance (M)"
                                      )
 
-    match_class = models.CharField(max_length= 10,
+    match_class = models.CharField(max_length= 100,
                                    help_text= "Enter the match class"
                                    )
 
-    match_name = models.CharField(max_length= 50,
+    match_name = models.CharField(max_length= 200,
                                   help_text= "Enter the match name"
                                   )
 
     match_prize = models.FloatField(help_text="Enter the match prize"
                                     )
 
-    match_going = models.CharField(max_length= 50,
+    match_going = models.CharField(max_length= 200,
                                    help_text= 'Enter the going of the match'
                                    )
-    match_course = models.CharField(max_length= 50,
+    match_course = models.CharField(max_length= 200,
                                     help_text= 'Enter the course of the match'
                                     )
 
@@ -309,7 +309,7 @@ class Match_Result(models.Model):
                               null= True
                               )
 
-    horse_place = models.CharField(max_length= 10,
+    horse_place = models.CharField(max_length= 100,
                                    help_text= "Enter the horse place"
                                    )
 
@@ -343,7 +343,7 @@ class Match_Result(models.Model):
     draw = models.IntegerField(help_text="Enter draw of the horse",
                                )
 
-    finish_time = models.CharField(max_length= 50,
+    finish_time = models.CharField(max_length= 200,
                                    help_text= "Enter the finish time"
                                    )
 

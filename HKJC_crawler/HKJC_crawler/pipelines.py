@@ -149,16 +149,10 @@ class MatchCrawlerPipeline(object):
         if isinstance(item, MatchResultItem):
             try:  # check whether the
                 match_result = Match_Result.objects.get(match= item['match'],
-                                                        horse= item['horse'],
-                                                        actual_weight= item['actual_weight'],
-                                                        declar_weight= item['declar_weight'],
-                                                        draw= item['draw'],
-                                                        finish_time= item['finish_time'],
-                                                        horse_no= item['horse_no'],
                                                         horse_place= item['horse_place'],
-                                                        jockey= item['jockey'],
-                                                        win_odds= item['win_odds']
                                                         )
+                item.id = match_result.id
+                item.save()
 
             except Match_Result.DoesNotExist: # save it if any amount is changed/ not exists
                 item.save()
