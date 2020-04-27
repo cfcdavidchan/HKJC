@@ -64,8 +64,8 @@ class Jockey_Info(models.Model):
                                      help_text="Enter the jockey's chinese name")
 
     hkjc_id = models.CharField(max_length= 10,
-                             blank= False,
-                             help_text="Enter the jockey's hkjc id")
+                               blank= False,
+                               help_text="Enter the jockey's hkjc id")
 
     modified_date = models.DateTimeField(auto_now=True)
     def __str__(self):
@@ -82,14 +82,18 @@ class Jockey_Report(models.Model):
                                null= True
                                )
 
+    season = models.CharField(max_length= 30,
+                              help_text="Enter the seaon of this record"
+                              )
+
     stakes_won = models.FloatField(help_text= 'Enter the stakes Stakes won'
-                                )
+                                   )
 
-    wins_past_10_racing = models.PositiveSmallIntegerField(help_text= 'Enter the No. of Wins in past 10 race days'
-                                )
+    wins_past_10_racing = models.PositiveSmallIntegerField(help_text= 'Enter the No. of Wins in past 10 race days',
+                                                           blank=True)
 
-    avg_JKC_past_10 = models.FloatField(help_text= 'Avg. JKC points in Past 10 race days'
-                                )
+    avg_JKC_past_10 = models.FloatField(help_text= 'Avg. JKC points in Past 10 race days',
+                                        blank=True)
 
     number_win = models.IntegerField(help_text= 'No. of Wins'
                                      )
@@ -109,10 +113,10 @@ class Jockey_Report(models.Model):
     win_rate = models.FloatField(help_text= 'Win %'
                                 )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['number_win']
+        ordering = ['season', 'number_win']
 
 class Trainer_Info(models.Model):
     name = models.CharField(max_length=50,

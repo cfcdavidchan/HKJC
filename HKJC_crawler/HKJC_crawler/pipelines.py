@@ -24,17 +24,30 @@ class JockeysCrawlerPipeline(object):
             item['jockey'] = Jockey
             JockeyReport_item = item.save(commit=False)
             try:  # check whether the Jockey Report data exists in Jockey_Report
-                Jockey_Report_data = Jockey_Report.objects.get(jockey=item['jockey'],
-                                                               stakes_won= item['stakes_won'],
-                                                               wins_past_10_racing= item['wins_past_10_racing'],
-                                                               avg_JKC_past_10= item['avg_JKC_past_10'],
-                                                               number_win= item['number_win'],
-                                                               number_second= item['number_second'],
-                                                               number_third= item['number_third'],
-                                                               number_fourth= item['number_fourth'],
-                                                               total_rides= item['total_rides'],
-                                                               win_rate= item['win_rate'],
+                # Jockey_Report_data = Jockey_Report.objects.get(jockey=item['jockey'],
+                #                                                stakes_won= item['stakes_won'],
+                #                                                wins_past_10_racing= item['wins_past_10_racing'],
+                #                                                avg_JKC_past_10= item['avg_JKC_past_10'],
+                #                                                number_win= item['number_win'],
+                #                                                number_second= item['number_second'],
+                #                                                number_third= item['number_third'],
+                #                                                number_fourth= item['number_fourth'],
+                #                                                total_rides= item['total_rides'],
+                #                                                win_rate= item['win_rate'],
+                #                                                )
+                Jockey_Report_data = Jockey_Report.objects.get(jockey= item['jockey'],
+                                                               season= item['season'],
                                                                )
+
+                update = False
+                for key, value in JockeyReport_item.__dict__.items():
+                    if value != Jockey_Report_data.__dict__[key]:
+                        update = True
+
+                if update:
+                    JockeyReport_item.id = Jockey_Report_data.id
+                    JockeyReport_item.save()
+
             except Jockey_Report.DoesNotExist: # save it if any amount is changed/ not exists
                 print ('Save Data:')
                 JockeyReport_item.save()
