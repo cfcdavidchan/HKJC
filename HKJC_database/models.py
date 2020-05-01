@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.postgres.fields import JSONField
+
 # Create your models here.
 class Going(models.Model):
     track = models.CharField(max_length= 50,
@@ -116,7 +118,7 @@ class Jockey_Report(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['season', 'number_win']
+        ordering = ['-season','-number_win',]
 
 class Trainer_Info(models.Model):
     name = models.CharField(max_length=50,
@@ -147,6 +149,10 @@ class Trainer_Report(models.Model):
                                null= True
                                )
 
+    season = models.CharField(max_length= 30,
+                              help_text="Enter the seaon of this record"
+                              )
+
     stakes_won = models.FloatField(help_text= 'Enter the stakes Stakes won'
                                 )
 
@@ -169,6 +175,9 @@ class Trainer_Report(models.Model):
                                      )
 
     win_rate = models.FloatField(help_text= 'Win %'
+                                )
+
+    win_stat = JSONField(help_text= 'Enter the json of the win state'
                                 )
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -247,7 +256,7 @@ class Horse_Report(models.Model):
     total_stakes = models.FloatField(help_text= "Enter the horse's total stakes"
                               )
 
-    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['horse']
@@ -267,7 +276,7 @@ class Horse_Ranking(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['horse']
+        ordering = ['horse','rank','-rank_reord_date']
 
 class Match_Info(models.Model):
     match_date = models.DateField(help_text="Enter the Match Date"
@@ -304,7 +313,13 @@ class Match_Info(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['match_date', 'race_number']
+        ordering = ['-match_date', 'race_number']
+
+    # def __str__(self):
+    #     """String for representing the MyModelName object (in Admin site etc.)."""
+    #     from datetime import datetime
+    #     date_string = datetime.strftime(self.match_date, '%Y/%m/%d')
+    #     return date_string
 
 class Match_Result(models.Model):
     match = models.ForeignKey(Match_Info,

@@ -10,4 +10,6 @@ __pycache__
 tmp.py
 tmp2.py
 recent_match.csv
-*.csv#
+*.csv
+*/HKJC-google-cred.json
+HKJC-google-cred.json
