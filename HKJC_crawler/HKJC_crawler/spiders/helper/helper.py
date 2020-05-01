@@ -32,6 +32,14 @@ def get_horse_chi_name(horse_english_name):
     except Horse_Info.DoesNotExist:
         return None
 
+def get_horse_age(horse_english_name):
+    try:
+        horse = Horse_Info.objects.get(name=horse_english_name)
+        return horse.age
+    except Horse_Info.DoesNotExist:
+        return None
+
+
 def get_jockey_chi_name(jockey_english_name):
     try:
         jockey = Jockey_Info.objects.get(name=jockey_english_name)
@@ -53,7 +61,7 @@ def get_horse_game_history(horse_name):
     '''
     game_history = []
     try:
-        horse = Horse_Info.objects.get(name__contains=horse_name)
+        horse = Horse_Info.objects.get(name=horse_name)
 
         match_result = Match_Result.objects.filter(horse=horse)
         for result in match_result: #loop over all tge game
@@ -61,7 +69,8 @@ def get_horse_game_history(horse_name):
             place = result.horse_place
             race_distance = result.match.distance_M
             game_class = result.match.match_class
-            game_data = [match_date, place, race_distance,game_class]
+            game_place = result.match.match_place
+            game_data = [match_date, place, race_distance,game_place,game_class]
 
             game_history.append(game_data)
     except:
@@ -73,18 +82,20 @@ def get_horse_game_history(horse_name):
     return game_history
 
 
-def get_result_by_distance(list_game_game_history, race_distance):
+def get_result_by_distance(list_game_game_history, race_distance, match_place):
     '''
     :param list_game_game_history: [[match_date, place, distance of game], ...]
     :return: [number of game, number of No.1, number of No.2, number of No.3, number of No.4]
     '''
+    print (list_game_game_history)
     number_of_game = 0
     number_of_first = 0
     number_of_second = 0
     number_of_third = 0
     number_of_fourth = 0
+
     for game_result in list_game_game_history: #loop over the game result
-        if game_result[2] == race_distance: #if the game result is equal to target distance
+        if game_result[2] == race_distance and game_result[-2] == match_place: #if the game result is equal to target distance
             number_of_game +=1
             try: #check whether it has result of the game
                 place = int(game_result[1])
@@ -102,26 +113,51 @@ def get_result_by_distance(list_game_game_history, race_distance):
     return [number_of_game, number_of_first, number_of_second, number_of_third, number_of_fourth]
 
 def get_class_change(game_history, current_class):
-    try:
-        current_class = current_class.lower().replace('class','').strip()
-        last_game = game_history[0]
-        last_class = last_game[-1]
-        last_class = last_class.lower().replace('class','').strip()
-    except:
-        return 'Unknown'
-    try:
-        current_class = int(current_class)
-        last_class = int(last_class)
-        if current_class < last_class:
-            return '升班'
-        if current_class == last_class:
-            return '同班'
-        if current_class > last_class:
-            return '降班'
+    game_class_history = []
+    class_change = ''
 
-    except:
+    if len(game_history) == 0: # no game history
+        class_change = 'unknown'
+        return game_class_history, class_change
+    else:
+        game_class_history = [game[-1] for game in game_history]
 
-        return 'Unknown'
+    if len(game_class_history) > 3:
+        game_class_history = game_class_history[:3]
+
+    try:
+        current_class = int(current_class.lower().replace('class', '').strip())
+    except: #cannot compare
+        class_change = 'unknown'
+        return game_class_history, class_change
+
+    compare_class_history = []
+    for i in range(3):
+        try:
+            game_class = int(game_class_history[i].lower().replace('class','').strip())
+        except:
+            game_class = None
+        compare_class_history.append(game_class)
+
+    while None in compare_class_history:
+        compare_class_history.remove(None)
+
+    if len(compare_class_history) == 0:
+        class_change = 'unknown'
+        return game_class_history, class_change
+    # 1 > 2 > 3 > 4 > 5
+    highest_class = min(compare_class_history)
+    lower_class = max(compare_class_history)
+
+    class_change = 'unknown'
+    if  current_class > highest_class:
+        class_change = '降班'
+    if  current_class < lower_class:
+        class_change = '升班'
+    if (current_class == lower_class) and (current_class == highest_class):
+        class_change = '同班'
+
+    return game_class_history, class_change
 
 def get_hourse_condition(game_history, match_date_str):
     try:
@@ -137,8 +173,10 @@ def get_hourse_condition(game_history, match_date_str):
 
         if delta.days < 45:
             status = '正常'
-        else:
+        elif delta.days < 180:
             status = '差'
+        else:
+            status = '極差'
     except:
         return 'Unknown', 'Unknown', 'Unknown'
 

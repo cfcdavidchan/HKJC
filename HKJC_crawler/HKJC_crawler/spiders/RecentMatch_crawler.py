@@ -3,10 +3,9 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 import pprint
 import csv
-from datetime import date
-from datetime import date
+import requests
 
-from .helper.helper import get_horse_chi_name, get_jockey_chi_name, get_trainer_chi_name, get_horse_game_history, get_result_by_distance, get_class_change, get_hourse_condition
+from .helper.helper import get_horse_chi_name, get_jockey_chi_name, get_trainer_chi_name, get_horse_game_history, get_result_by_distance, get_class_change, get_hourse_condition, get_horse_age
 
 class RecentMatchSpider(scrapy.Spider):
     name = 'RecentMatch_crawler'
@@ -21,7 +20,15 @@ class RecentMatchSpider(scrapy.Spider):
         self.match_date = self.match_date[:self.match_date.find(',')]
         self.match_date = datetime.strptime(self.match_date, '%d/%m/%Y')
         self.match_date = datetime.strftime(self.match_date, '%Y/%m/%d')
-        self.match_place = match_info[-1]
+        self.match_content['match_date'] = self.match_date
+        self.match_place = [match_info[-1]]  # chinese place name
+        # Get the English place name
+        englist_info = requests.get('https://bet.hkjc.com/racing/pages/odds_wp.aspx/?lang=en')
+        englist_info = BeautifulSoup(englist_info.content, 'html.parser') #Get the English place name
+        match_place_eng = englist_info.find('div', attrs={'class': "mtgInfoDV"}).text
+        match_place_eng = match_place_eng.split(',')[-1]
+        match_place_eng = match_place_eng.lower().strip()
+        self.match_place.append(match_place_eng)
 
         self.match_content['match_date'] = self.match_date
         self.match_content['match_place'] = self.match_place
@@ -61,10 +68,11 @@ class RecentMatchSpider(scrapy.Spider):
         race_info = response.xpath('//div[contains(@style, "float:left;vertical-align:middle;width:85%")]/span[contains(@class, "content")]//text()').extract()
         race_time = race_info[3].replace(',','').lower().strip()
         race_class = race_info[5].replace(',','').lower().strip()
-        race_course = race_info[9].replace(',','').lower().strip()
+        race_course = race_info[7].replace(',','').lower().strip()
         race_distance = race_info[-1].replace(',','').lower().replace('m','').strip()
         self.match_content[race_number]['Race Info'] = [race_time, race_class, race_course,race_distance]
         self.match_content[race_number]['Race Horse'] = dict()
+
         #Race Horse
         all_horse = response.xpath('//tr[contains(@height, "22px")]').extract()
         #loop over horse
@@ -74,7 +82,9 @@ class RecentMatchSpider(scrapy.Spider):
 
             # Draw if no draw then skip it
             skip_row = False
-            horse_draw = horse[4].get_text().strip()
+            horse_draw = horse[5].get_text().strip()
+            print ('horse_draw')
+            print(horse_draw)
             try:
                 horse_draw = int(horse_draw)
                 #self.match_content[race_number]['Race Horse']['draw'] = horse_draw
@@ -95,17 +105,20 @@ class RecentMatchSpider(scrapy.Spider):
             # Horse Name, Horse Chi Name
             horse_name = horse[3].get_text().strip()
             horse_chi_name = get_horse_chi_name(horse_name)
+            horse_horse_age = get_horse_age(horse_name)
             self.match_content[race_number]['Race Horse'][Horse_number]['name'] = horse_chi_name
-
+            self.match_content[race_number]['Race Horse'][Horse_number]['age'] = horse_horse_age
             #jockey
-            jockey_name = horse[6].get_text().strip()
+            jockey_name = horse[7].get_text().strip()
             if jockey_name.find('(') > 0: #jockey has (-XX)
                 jockey_name = jockey_name[:jockey_name.find('(')].strip()
+            print('jockey_name')
+            print (jockey_name)
             jockey_chi_name = get_jockey_chi_name(jockey_name)
             self.match_content[race_number]['Race Horse'][Horse_number]['jockey'] = jockey_chi_name
 
             # trainer
-            trainer_name = horse[7].get_text().strip()
+            trainer_name = horse[8].get_text().strip()
             trainer_chi_name = get_trainer_chi_name(trainer_name)
             self.match_content[race_number]['Race Horse'][Horse_number]['trainer'] = trainer_chi_name
 
@@ -128,12 +141,14 @@ class RecentMatchSpider(scrapy.Spider):
             self.match_content[race_number]['Race Horse'][Horse_number]['last 6 Runs'] = last_6_place
 
             # 'same distance game result'
-            same_distance = get_result_by_distance(horse_game_history, int(race_distance))
+            same_distance = get_result_by_distance(horse_game_history, int(race_distance), self.match_place[-1])
             self.match_content[race_number]['Race Horse'][Horse_number]['same distance game result'] = same_distance
 
             # class change
-            class_change = get_class_change(horse_game_history, race_class)
+            game_history_class, class_change = get_class_change(horse_game_history, race_class)
             self.match_content[race_number]['Race Horse'][Horse_number]['class change'] = class_change
+            self.match_content[race_number]['Race Horse'][Horse_number]['game_history_class'] = game_history_class
+
 
             # last game date
             last_game_date, last_game_days_delta, status = get_hourse_condition(horse_game_history, self.match_date)
@@ -166,18 +181,24 @@ class RecentMatchSpider(scrapy.Spider):
                               '賽程:', self.match_content[race_key]['Race Info'][3],
                               ]))
 
-                wr.writerow (['馬號', '檔位', '馬名', '騎師', '練馬師',
+                wr.writerow (['馬號', '檔位', '馬名', '馬齡', '騎師', '練馬師',
                               'last game 1', 'last game 2', 'last game 3', 'last game 4', 'last game 5', 'last game 6',
                               '同路程次數', '同路程冠', '同路程亞', '同路程季', '同路程殿',
-                              '升/降班', '上次比賽日', '離上次比賽日數', '狀態'
+                              '上場班次','兩場前班次','三場次班次','升/降班', '上次比賽日', '離上次比賽日數', '狀態'
                               ])
 
                 for horse_num, horse_detail in self.match_content[race_key]['Race Horse'].items():
-                    horse_row = [horse_num, horse_detail['draw'], horse_detail['name'],horse_detail['jockey'], horse_detail['trainer']]
+                    horse_row = [horse_num, horse_detail['draw'], horse_detail['name'], horse_detail['age'], horse_detail['jockey'], horse_detail['trainer']]
                     for place in horse_detail['last 6 Runs']:
                         horse_row.append(place)
                     for result in horse_detail['same distance game result']:
                         horse_row.append(result)
+                    for i in range(3):
+                        try:
+                            content = horse_detail['game_history_class'][i]
+                            horse_row.append(content)
+                        except:
+                            horse_row.append('No game history')
                     horse_row.append(horse_detail['class change'])
                     horse_row.append(horse_detail['last game date'])
                     horse_row.append(horse_detail['last game date delta'])

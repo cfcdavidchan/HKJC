@@ -28,9 +28,9 @@ class HorseCrawler(scrapy.Spider):
             if b'Cookies must be enabled in order to view this page.' not in testing:
                 yield scrapy.Request (match_url, callback=self.match_race_number)
         ## testing ##
-        #
-        # match_url = 'https://racing.hkjc.com/racing/information/english/Racing/LocalResults.aspx/?RaceDate=' + match_date_list[1]
-        # match_url = 'https://racing.hkjc.com/racing/information/english/Racing/LocalResults.aspx/?RaceDate=2019/11/03'
+
+        #match_url = 'https://racing.hkjc.com/racing/information/english/Racing/LocalResults.aspx/?RaceDate=' + match_date_list[1]
+        # match_url = 'https://racing.hkjc.com/racing/information/english/Racing/LocalResults.aspx/?RaceDate=2019/04/24'
         # yield scrapy.Request(match_url, callback=self.match_race_number)
 
     def match_race_number(self, response):

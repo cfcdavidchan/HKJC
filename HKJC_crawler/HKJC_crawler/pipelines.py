@@ -90,16 +90,29 @@ class TrainersCrawlerPipeline(object):
             item['trainer'] = Trainer
             TrainerReport_item = item.save(commit=False)
             try:  # check whether the Jockey Report data exists in Jockey_Report
-                Trainer_Report_data = Trainer_Report.objects.get(trainer=item['trainer'],
-                                                                 stakes_won= item['stakes_won'],
-                                                                 wins_past_10_racing= item['wins_past_10_racing'],
-                                                                 number_win= item['number_win'],
-                                                                 number_second= item['number_second'],
-                                                                 number_third= item['number_third'],
-                                                                 number_fourth= item['number_fourth'],
-                                                                 total_runners= item['total_runners'],
-                                                                 win_rate= item['win_rate']
+                # Trainer_Report_data = Trainer_Report.objects.get(trainer=item['trainer'],
+                #                                                  stakes_won= item['stakes_won'],
+                #                                                  wins_past_10_racing= item['wins_past_10_racing'],
+                #                                                  number_win= item['number_win'],
+                #                                                  number_second= item['number_second'],
+                #                                                  number_third= item['number_third'],
+                #                                                  number_fourth= item['number_fourth'],
+                #                                                  total_runners= item['total_runners'],
+                #                                                  win_rate= item['win_rate']
+                #                                                  )
+                trainer_Report_data = Trainer_Report.objects.get(trainer= item['trainer'],
+                                                                 season= item['season'],
                                                                  )
+
+                update = False
+                for key, value in TrainerReport_item.__dict__.items():
+                    if value != trainer_Report_data.__dict__[key]:
+                        update = True
+
+                if update:
+                    TrainerReport_item.id = trainer_Report_data.id
+                    TrainerReport_item.save()
+
             except Trainer_Report.DoesNotExist: # save it if any amount is changed/ not exists
                 print ('Save Data:')
                 TrainerReport_item.save()
@@ -164,8 +177,10 @@ class MatchCrawlerPipeline(object):
                 match_result = Match_Result.objects.get(match= item['match'],
                                                         horse_place= item['horse_place'],
                                                         )
-                item.id = match_result.id
-                item.save()
+
+                MatchResult_Item = item.save(commit=False)
+                MatchResult_Item.id = match_result.id
+                MatchResult_Item.save()
 
             except Match_Result.DoesNotExist: # save it if any amount is changed/ not exists
                 item.save()

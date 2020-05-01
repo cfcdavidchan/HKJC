@@ -25,7 +25,7 @@ class HorseCrawler(scrapy.Spider):
             yield scrapy.Request (trainer_directory, callback=self.trainer_detail)
 
     def trainer_detail(self, response):
-        # check whether the trainer has hors
+        #check whether the trainer has hors
         print ('\n\n\nIn trainer Detail')
         table = response.xpath('//table[@class= "bigborder"]//td[@class="table_eng_text"]/font[@color="#FFFFFF"]/text()').extract_first()
         if table == None: # The Trainer has Horse coz it does't has NIL example:https://racing.hkjc.com/racing/information/english/Horse/ListbyStable.aspx?TrainerId=TY
@@ -49,6 +49,8 @@ class HorseCrawler(scrapy.Spider):
             print (trainer_id)
             print('The Trainer does not has any horses')
             pass
+        #horse_url = 'https://racing.hkjc.com/racing/information/English/Horse/Horse.aspx/?HorseId=HK_2016_A202'
+        #yield scrapy.Request(horse_url, callback=self.parseHorsedetail)
 
     def parseHorsedetail(self, response):
         # HorseInfoItem field
