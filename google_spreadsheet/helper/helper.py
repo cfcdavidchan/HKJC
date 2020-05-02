@@ -61,7 +61,7 @@ import django
 django.setup()
 
 #from ..HKJC_database.models import Jockey_Info, Trainer_Info, Horse_Info, Match_Result, Jockey_Report
-from HKJC_database.models import Jockey_Info, Jockey_Report, Trainer_Info, Trainer_Report
+from HKJC_database.models import Jockey_Info, Jockey_Report, Trainer_Info, Trainer_Report, Match_Result
 #from ..HKJC_database.models import Jockey_Info, Jockey_Report
 
 def get_list_jockey_season_report():
@@ -204,6 +204,61 @@ def get_list_trainer_season_report():
 
     return trainer_season_report
 
+def get_trainerXjockey_rate():
+    # get all trainer chinese name
+    all_trainer = Trainer_Info.objects.all()
+    all_trainer_chi_name = [trainer.chinese_name for trainer in all_trainer]
+
+    # get all jockey chinese name
+    all_jockey = Jockey_Info.objects.all()
+    all_jockey_chi_name = [jockey.chinese_name for jockey in all_jockey]
+
+    result_dict = dict()
+
+    for trainer in all_trainer:
+        trainer_id = trainer.id
+        trainer_chi_name = trainer.chinese_name
+
+        result_dict[trainer_chi_name] = dict()
+
+        for jockey in all_jockey:
+            jockey_id = jockey.id
+            jockey_chi_name = jockey.chinese_name
+
+            result_dict[trainer_chi_name][jockey_chi_name] =dict()
+            result_dict[trainer_chi_name][jockey_chi_name]['number of game'] = int()
+            result_dict[trainer_chi_name][jockey_chi_name]['in place'] = [] # number_win, win_rate
+            result_dict[trainer_chi_name][jockey_chi_name]['in win'] = []  # number_place, place_rate
+
+            #count number of game
+            number_game = len(Match_Result.objects.filter(trainer_id= trainer.id, jockey_id= jockey_id))
+            result_dict[trainer_chi_name][jockey_chi_name]['number of game'] = number_game
+
+            #count number of win
+            number_win = len(Match_Result.objects.filter(trainer_id= trainer.id, jockey_id= jockey_id, horse_place= 1))
+            if number_game == 0:
+                win_rate = 0
+            else:
+                win_rate = number_win/number_game
+
+            result_dict[trainer_chi_name][jockey_chi_name]['in win'] = [number_win, win_rate]
+
+            #count number of win
+            number_place = len(Match_Result.objects.filter(trainer_id= trainer.id, jockey_id= jockey_id, horse_place__in= [1,2,3]))
+            if number_game == 0:
+                place_rate = 0
+            else:
+                place_rate = number_place/number_game
+
+            result_dict[trainer_chi_name][jockey_chi_name]['in place'] = [number_place, place_rate]
+
+    return result_dict, all_trainer_chi_name, all_jockey_chi_name
+
+
+
 
 if __name__ == '__main__':
-    pprint (get_list_trainer_season_report())
+    #pprint (get_list_trainer_season_report())
+    result_dict, all_trainer_chi_name, all_jockey_chi_name =  get_trainerXjockey_rate()
+    pprint (result_dict)
+    pass

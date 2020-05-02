@@ -169,13 +169,45 @@ def google_trainer_data(google, sheet_index):
     print('Success to store Trainer Data store into Google')
 
 
+def google_trainerXjockey(google, sheet_index, rate_type='in place'):
+    trainerXjockey, all_trainer_chi_name, all_jockey_chi_name = helper.get_trainerXjockey_rate()
+
+    write_data = []
+
+    first_row = ['']
+    for trainer in all_trainer_chi_name:
+        first_row.append(trainer)
+    write_data.append(first_row)
+
+    for jockey in all_jockey_chi_name:
+        row = [jockey]
+        for trainer in all_trainer_chi_name:
+            rate = trainerXjockey[trainer][jockey][rate_type][1]
+            row.append(rate)
+
+        write_data.append(row)
+
+    google.clean_and_write(sheet_index=sheet_index, data=write_data)
+    google.get_worksheet(sheet_index).format("B2:60", {"horizontalAlignment": "CENTER",
+                                                     'numberFormat': {
+                                                         "type": "PERCENT",
+                                                         "pattern": '.##%'},
+                                                     "textFormat": {
+                                                         "foregroundColor": {"red": 0.0,
+                                                                             "green": 0.0,
+                                                                             "blue": 2.0
+                                                                             }
+                                                     }
+                                                     })
+
 
 
 google = helper.google_sheet_manager(cred_json, worksheet_key)
 all_sheet = google.all_sheet_name_dict()
-google_jockey_data(google, sheet_index= all_sheet['騎師資料'])
-google_trainer_data(google, sheet_index= all_sheet['練馬師資料'])
-
+#google_jockey_data(google, sheet_index= all_sheet['騎師資料'])
+#google_trainer_data(google, sheet_index= all_sheet['練馬師資料'])
+google_trainerXjockey(google, sheet_index= all_sheet['練騎合拍_win'], rate_type= "in win")
+google_trainerXjockey(google, sheet_index= all_sheet['練騎合拍_place'], rate_type= "in place")
 # format the related shell
 
 

@@ -344,10 +344,16 @@ class Match_Result(models.Model):
                               )
 
     jockey = models.ForeignKey(Jockey_Info,
-                              related_name= 'match_horse',
+                              related_name= 'match_jockey',
                               on_delete= models.SET_NULL,
                               null= True
                               )
+
+    trainer = models.ForeignKey(Trainer_Info,
+                                related_name= 'horse_trainer',
+                                on_delete= models.SET_NULL,
+                                null= True
+                                )
 
     actual_weight = models.IntegerField(help_text="Enter actual weight of the horse",
                                         blank=True,

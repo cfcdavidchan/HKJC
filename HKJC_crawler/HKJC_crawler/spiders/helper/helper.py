@@ -9,9 +9,6 @@ chrome_path = os.path.join(base_path, 'chromedriver')
 def get_chrome_path():
     return chrome_path
 
-if __name__ == "main":
-    pass
-
 ##Obtain django data
 
 # base_path = sys.path[0] # obtain the path of this directory

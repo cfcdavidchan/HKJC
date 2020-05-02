@@ -1,6 +1,6 @@
 import scrapy
 from HKJC_crawler.items import MatchInfoItem, MatchResultItem
-from HKJC_database.models import Match_Info, Horse_Info, Jockey_Info
+from HKJC_database.models import Match_Info, Horse_Info, Jockey_Info, Trainer_Info
 from bs4 import BeautifulSoup
 import requests
 from datetime import datetime
@@ -146,6 +146,7 @@ class HorseCrawler(scrapy.Spider):
             match_result['horse_no'] = None
             match_result['horse'] = None  # foreignkey from Horse_Info
             match_result['jockey'] = None  # foreignkey from Jockey_Info
+            match_result['trainer'] = None  # foreignkey from Trainer_Info
             match_result['actual_weight'] = 0
             match_result['declar_weight'] = 0
             match_result['draw'] = 0
@@ -184,6 +185,16 @@ class HorseCrawler(scrapy.Spider):
                 jockey = jockey[len(jockey_api_key)+jockey.find(jockey_api_key): jockey.find('&')]
                 jockey = Jockey_Info.objects.get(hkjc_id= jockey)
                 match_result['jockey'] = jockey
+            except:
+                pass
+
+            # trainer
+            try:
+                trainer = result[4].find('a').get('href')
+                trainer_api_key = 'TrainerId='
+                trainer = trainer[len(trainer_api_key)+trainer.find(trainer_api_key): trainer.find('&')]
+                trainer = Trainer_Info.objects.get(hkjc_id= trainer)
+                match_result['trainer'] = trainer
             except:
                 pass
 
