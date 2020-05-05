@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import pprint
 import csv
 import requests
+import sys
 
 from .helper.helper import get_horse_chi_name, get_jockey_chi_name, get_trainer_chi_name, get_horse_game_history, get_result_by_distance, get_class_change, get_hourse_condition, get_horse_age
 
@@ -69,7 +70,7 @@ class RecentMatchSpider(scrapy.Spider):
         race_time = race_info[3].replace(',','').lower().strip()
         race_class = race_info[5].replace(',','').lower().strip()
         race_course = race_info[7].replace(',','').lower().strip()
-        race_distance = race_info[-1].replace(',','').lower().replace('m','').strip()
+        race_distance = race_info[11].replace(',','').lower().replace('m','').strip()
         self.match_content[race_number]['Race Info'] = [race_time, race_class, race_course,race_distance]
         self.match_content[race_number]['Race Horse'] = dict()
 
@@ -93,7 +94,6 @@ class RecentMatchSpider(scrapy.Spider):
 
             if skip_row:
                 continue
-
             # Horse number
             Horse_number = horse[1].get_text()
             try:
@@ -102,6 +102,22 @@ class RecentMatchSpider(scrapy.Spider):
                 Horse_number = 0
             self.match_content[race_number]['Race Horse'][Horse_number] = dict()
             self.match_content[race_number]['Race Horse'][Horse_number]['draw'] = horse_draw
+
+            #star or plus
+            star = False
+            plus = False
+             #get all horse image
+            imgs = horse[0].findAll('img')
+            for img in imgs:
+                src = img['src']
+                if 'star' in src:
+                    star = True
+                if 'plus' in src:
+                    plus = True
+
+            self.match_content[race_number]['Race Horse'][Horse_number]['star'] = star
+            self.match_content[race_number]['Race Horse'][Horse_number]['plus'] = plus
+
             # Horse Name, Horse Chi Name
             horse_name = horse[3].get_text().strip()
             horse_chi_name = get_horse_chi_name(horse_name)
@@ -181,14 +197,14 @@ class RecentMatchSpider(scrapy.Spider):
                               '賽程:', self.match_content[race_key]['Race Info'][3],
                               ]))
 
-                wr.writerow (['馬號', '檔位', '馬名', '馬齡', '騎師', '練馬師',
+                wr.writerow (['馬號', '王牌', '優先', '檔位', '馬名', '馬齡', '騎師', '練馬師',
                               'last game 1', 'last game 2', 'last game 3', 'last game 4', 'last game 5', 'last game 6',
                               '同路程次數', '同路程冠', '同路程亞', '同路程季', '同路程殿',
                               '上場班次','兩場前班次','三場次班次','升/降班', '上次比賽日', '離上次比賽日數', '狀態'
                               ])
 
                 for horse_num, horse_detail in self.match_content[race_key]['Race Horse'].items():
-                    horse_row = [horse_num, horse_detail['draw'], horse_detail['name'], horse_detail['age'], horse_detail['jockey'], horse_detail['trainer']]
+                    horse_row = [horse_num, horse_detail['plus'], horse_detail['star'], horse_detail['draw'], horse_detail['name'], horse_detail['age'], horse_detail['jockey'], horse_detail['trainer']]
                     for place in horse_detail['last 6 Runs']:
                         horse_row.append(place)
                     for result in horse_detail['same distance game result']:
