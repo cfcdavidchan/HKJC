@@ -70,10 +70,15 @@ class RecentMatchSpider(scrapy.Spider):
         race_time = race_info[3].replace(',','').lower().strip()
         race_class = race_info[5].replace(',','').lower().strip()
         race_course = race_info[7].replace(',','').lower().strip()
-        race_distance = race_info[11].replace(',','').lower().replace('m','').strip()
+        if race_course == 'ALL WEATHER TRACK'.lower().strip():
+            race_distance = race_info[9].replace(',', '').lower().replace('m', '').strip()
+        else:
+            race_distance = race_info[11].replace(',','').lower().replace('m','').strip()
         self.match_content[race_number]['Race Info'] = [race_time, race_class, race_course,race_distance]
         self.match_content[race_number]['Race Horse'] = dict()
-
+        print ('\n\n')
+        print (race_number)
+        print(self.match_content[race_number]['Race Info'])
         #Race Horse
         all_horse = response.xpath('//tr[contains(@height, "22px")]').extract()
         #loop over horse
@@ -84,8 +89,7 @@ class RecentMatchSpider(scrapy.Spider):
             # Draw if no draw then skip it
             skip_row = False
             horse_draw = horse[5].get_text().strip()
-            print ('horse_draw')
-            print(horse_draw)
+
             try:
                 horse_draw = int(horse_draw)
                 #self.match_content[race_number]['Race Horse']['draw'] = horse_draw
@@ -128,8 +132,6 @@ class RecentMatchSpider(scrapy.Spider):
             jockey_name = horse[7].get_text().strip()
             if jockey_name.find('(') > 0: #jockey has (-XX)
                 jockey_name = jockey_name[:jockey_name.find('(')].strip()
-            print('jockey_name')
-            print (jockey_name)
             jockey_chi_name = get_jockey_chi_name(jockey_name)
             self.match_content[race_number]['Race Horse'][Horse_number]['jockey'] = jockey_chi_name
 
@@ -175,10 +177,10 @@ class RecentMatchSpider(scrapy.Spider):
 
 
     def closed(self, reason):
-        print (self.match_content.keys())
+        #print (self.match_content.keys())
         total_race = len(self.match_content.keys()) - 2
         print (total_race)
-        pprint.pprint(self.match_content)
+        #pprint.pprint(self.match_content)
         print('Spider ended:', reason)
 
         with open('recent_match.csv', 'w') as recent_csv:

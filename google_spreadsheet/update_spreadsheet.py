@@ -204,8 +204,8 @@ def google_trainerXjockey(google, sheet_index, rate_type='in place'):
 
 google = helper.google_sheet_manager(cred_json, worksheet_key)
 all_sheet = google.all_sheet_name_dict()
-#google_jockey_data(google, sheet_index= all_sheet['騎師資料'])
-#google_trainer_data(google, sheet_index= all_sheet['練馬師資料'])
+google_jockey_data(google, sheet_index= all_sheet['騎師資料'])
+google_trainer_data(google, sheet_index= all_sheet['練馬師資料'])
 google_trainerXjockey(google, sheet_index= all_sheet['練騎合拍_win'], rate_type= "in win")
 google_trainerXjockey(google, sheet_index= all_sheet['練騎合拍_place'], rate_type= "in place")
 # format the related shell

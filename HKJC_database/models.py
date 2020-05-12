@@ -180,7 +180,7 @@ class Trainer_Report(models.Model):
     win_stat = JSONField(help_text= 'Enter the json of the win state'
                                 )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['number_win']
@@ -273,7 +273,7 @@ class Horse_Ranking(models.Model):
 
     rank_reord_date = models.DateField(help_text="Enter the record date of the rank"
                                        )
-    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['horse','rank','-rank_reord_date']
@@ -310,7 +310,7 @@ class Match_Info(models.Model):
                                     help_text= 'Enter the course of the match'
                                     )
 
-    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-match_date', 'race_number']
@@ -375,5 +375,5 @@ class Match_Result(models.Model):
     win_odds = models.FloatField(help_text="Enter the win odds"
                                  )
 
-    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
