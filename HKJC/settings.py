@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'HKJC_database',
-    'HKJC_crawler',
 ]
 
 MIDDLEWARE = [

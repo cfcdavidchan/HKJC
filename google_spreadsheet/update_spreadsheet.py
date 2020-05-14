@@ -174,38 +174,53 @@ def google_trainerXjockey(google, sheet_index, rate_type='in place'):
 
     write_data = []
 
-    first_row = ['']
+    header = ['']
     for trainer in all_trainer_chi_name:
-        first_row.append(trainer)
-    write_data.append(first_row)
+        header.extend(['',''])
+        header.append(trainer)
+    write_data.append(header)
 
+    row_number = 2
     for jockey in all_jockey_chi_name:
         row = [jockey]
+
+        column_name = helper.excel_column() #get excel columne name e.g. A,B,C.....AA,AB
+        column_pointer = 0
         for trainer in all_trainer_chi_name:
-            rate = trainerXjockey[trainer][jockey][rate_type][1]
-            row.append(rate)
+            number_game = trainerXjockey[trainer][jockey]['number of game']
+            in_post = trainerXjockey[trainer][jockey][rate_type][0]
+            if number_game == 0:
+                rate = 0
+            else:
+                rate = '={}{}/{}{}'.format(column_name[column_pointer+1], row_number, column_name[column_pointer], row_number)
+
+            row.extend([number_game, in_post, rate])
+
+            column_pointer +=3
 
         write_data.append(row)
+        row_number += 1
+
 
     google.clean_and_write(sheet_index=sheet_index, data=write_data)
-    google.get_worksheet(sheet_index).format("B2:60", {"horizontalAlignment": "CENTER",
-                                                     'numberFormat': {
-                                                         "type": "PERCENT",
-                                                         "pattern": '.##%'},
-                                                     "textFormat": {
-                                                         "foregroundColor": {"red": 0.0,
-                                                                             "green": 0.0,
-                                                                             "blue": 2.0
-                                                                             }
-                                                     }
-                                                     })
+    # google.get_worksheet(sheet_index).format("B2:60", {"horizontalAlignment": "CENTER",
+    #                                                  'numberFormat': {
+    #                                                      "type": "PERCENT",
+    #                                                      "pattern": '.##%'},
+    #                                                  "textFormat": {
+    #                                                      "foregroundColor": {"red": 0.0,
+    #                                                                          "green": 0.0,
+    #                                                                          "blue": 2.0
+    #                                                                          }
+    #                                                  }
+    #                                                  })
 
 
 
 google = helper.google_sheet_manager(cred_json, worksheet_key)
 all_sheet = google.all_sheet_name_dict()
-google_jockey_data(google, sheet_index= all_sheet['騎師資料'])
-google_trainer_data(google, sheet_index= all_sheet['練馬師資料'])
+# google_jockey_data(google, sheet_index= all_sheet['騎師資料'])
+# google_trainer_data(google, sheet_index= all_sheet['練馬師資料'])
 google_trainerXjockey(google, sheet_index= all_sheet['練騎合拍_win'], rate_type= "in win")
 google_trainerXjockey(google, sheet_index= all_sheet['練騎合拍_place'], rate_type= "in place")
 # format the related shell

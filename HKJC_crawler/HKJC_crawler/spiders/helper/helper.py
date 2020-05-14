@@ -11,13 +11,13 @@ def get_chrome_path():
 
 ##Obtain django data
 
-# base_path = sys.path[0] # obtain the path of this directory
-# project_path = os.path.abspath(os.path.join(base_path, '../../'))
-# sys.path.append(project_path)
+base_path = sys.path[0] # obtain the path of this directory
+project_path = os.path.abspath(os.path.join(base_path, '../../'))
+sys.path.append(project_path)
 
-# os.environ.setdefault('DJANGO_SETTINGS_MODULE','HKJC.settings')
-# import django
-# django.setup()
+os.environ.setdefault('DJANGO_SETTINGS_MODULE','HKJC.settings')
+import django
+django.setup()
 
 from HKJC_database.models import Jockey_Info, Trainer_Info, Horse_Info, Match_Result
 from django.forms.models import model_to_dict

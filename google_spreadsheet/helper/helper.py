@@ -255,10 +255,24 @@ def get_trainerXjockey_rate():
     return result_dict, all_trainer_chi_name, all_jockey_chi_name
 
 
+def excel_column():
+    from string import ascii_uppercase
+
+    b_z = [letter for letter in ascii_uppercase[1:]]
+
+    aa_az = ['A' + letter for letter in ascii_uppercase]
+    ba_az = ['B' + letter for letter in ascii_uppercase]
+    ca_az = ['C' + letter for letter in ascii_uppercase]
+    da_az = ['D' + letter for letter in ascii_uppercase]
+    ea_az = ['E' + letter for letter in ascii_uppercase]
+
+    all_column = b_z + aa_az + ba_az + ca_az + da_az + ea_az
+
+    return all_column
 
 
 if __name__ == '__main__':
     #pprint (get_list_trainer_season_report())
-    result_dict, all_trainer_chi_name, all_jockey_chi_name =  get_trainerXjockey_rate()
-    pprint (result_dict)
+    # result_dict, all_trainer_chi_name, all_jockey_chi_name =  get_trainerXjockey_rate()
+    # pprint (result_dict)
     pass
