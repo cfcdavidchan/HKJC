@@ -52,7 +52,7 @@ class google_sheet_manager():
 
 
 
-import os, sys
+import os, sys, csv
 base_path = sys.path[0] # obtain the path of this directory
 project_path = os.path.abspath(os.path.join(base_path, '../'))
 sys.path.append(project_path)
@@ -270,6 +270,17 @@ def excel_column():
 
     return all_column
 
+def get_recent_match():
+    path = os.getcwd()
+    project_path = os.path.dirname(path)
+    csv_path = os.path.join(project_path, 'HKJC_crawler')
+    csv_path = os.path.join(csv_path, 'recent_match.csv')
+
+    with open(csv_path, newline='') as f:
+        reader = csv.reader(f)
+        data = list(reader)
+
+    return data
 
 if __name__ == '__main__':
     #pprint (get_list_trainer_season_report())
