@@ -159,7 +159,7 @@ class RecentMatchSpider(scrapy.Spider):
             self.match_content[race_number]['Race Horse'][Horse_number]['last 6 Runs'] = last_6_place
 
             # 'same distance game result'
-            same_distance = get_result_by_distance(horse_game_history, int(race_distance), self.match_place[-1])
+            same_distance = get_result_by_distance(horse_game_history, int(race_distance), self.match_place[-1], self.match_content[race_number]['Race Info'][2])
             self.match_content[race_number]['Race Horse'][Horse_number]['same distance game result'] = same_distance
 
             # class change

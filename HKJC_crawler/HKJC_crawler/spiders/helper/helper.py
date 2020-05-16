@@ -79,11 +79,46 @@ def get_horse_game_history(horse_name):
     return game_history
 
 
-def get_result_by_distance(list_game_game_history, race_distance, match_place):
+def get_result_by_distance(list_game_game_history, race_distance, match_place, track):
     '''
     :param list_game_game_history: [[match_date, place, distance of game], ...]
     :return: [number of game, number of No.1, number of No.2, number of No.3, number of No.4]
     '''
+
+    def distance_range(match_place, race_distance, track):
+        '''
+        :param match_place: sha tin or happy valley
+        :param race_distance: int()
+        :param track:  turf or all weather
+        :return: list()
+        '''
+        distance_range_dict = {'happy valley':
+                                   {'turf':
+                                        {'short_range': [1000, 1200],
+                                         'mid_range': [1650, 1800],
+                                         'long_range': [1800, 2000, 2200, 2400]
+                                         }
+                                    },
+                               'sha tin':
+                                   {'turf':
+                                        {'short_range': [1000],
+                                         'mid_range': [1200, 1400, 1600],
+                                         'long_range': [1800, 2000, 2200, 2400]
+                                         },
+                                    'all weather':
+                                        {'short_range': [1200],
+                                         'mid_range': [1650, 1800],
+                                         'long_range': [2000, 2400]
+                                         }
+                                    }
+                               }
+
+        for race_range, distance_list in distance_range_dict[match_place.lower()][track.lower()].items():
+            if race_distance in distance_list:
+                print(race_range)
+                return distance_list
+
+    distance_list = distance_range(match_place, race_distance, track)
     print (list_game_game_history)
     number_of_game = 0
     number_of_first = 0
@@ -92,7 +127,7 @@ def get_result_by_distance(list_game_game_history, race_distance, match_place):
     number_of_fourth = 0
 
     for game_result in list_game_game_history: #loop over the game result
-        if game_result[2] == race_distance and game_result[-2] == match_place: #if the game result is equal to target distance
+        if game_result[2] in distance_list and game_result[-2] == match_place: #if the game result is equal to target distance
             number_of_game +=1
             try: #check whether it has result of the game
                 place = int(game_result[1])
