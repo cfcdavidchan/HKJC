@@ -105,7 +105,7 @@ def get_result_by_distance(list_game_game_history, race_distance, match_place, t
                                          'mid_range': [1200, 1400, 1600],
                                          'long_range': [1800, 2000, 2200, 2400]
                                          },
-                                    'all weather':
+                                    'all weather track':
                                         {'short_range': [1200],
                                          'mid_range': [1650, 1800],
                                          'long_range': [2000, 2400]
