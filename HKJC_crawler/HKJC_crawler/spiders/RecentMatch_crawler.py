@@ -70,11 +70,13 @@ class RecentMatchSpider(scrapy.Spider):
         race_time = race_info[3].replace(',','').lower().strip()
         race_class = race_info[5].replace(',','').lower().strip()
         race_course = race_info[7].replace(',','').lower().strip()
+        race_track = race_info[9].replace(',','').upper().strip().replace('COURSE','').replace('"','')
+
         if race_course == 'ALL WEATHER TRACK'.lower().strip():
             race_distance = race_info[9].replace(',', '').lower().replace('m', '').strip()
         else:
             race_distance = race_info[11].replace(',','').lower().replace('m','').strip()
-        self.match_content[race_number]['Race Info'] = [race_time, race_class, race_course,race_distance]
+        self.match_content[race_number]['Race Info'] = [race_time, race_class, race_course, race_track, race_distance]
         self.match_content[race_number]['Race Horse'] = dict()
         print ('\n\n')
         print (race_number)
@@ -185,44 +187,86 @@ class RecentMatchSpider(scrapy.Spider):
 
         with open('recent_match.csv', 'w') as recent_csv:
             wr = csv.writer(recent_csv, quoting=csv.QUOTE_ALL)
-            wr.writerow(['Match Date:', self.match_content['match_date'],'','Match Place:', self.match_content['match_place']])
+            heeder_row = ['' for i in range(11)]
+            heeder_row += ['Match Date:', self.match_content['match_date'],'','Match Place:', self.match_content['match_place']]
+            wr.writerow(heeder_row)
             wr.writerow([])
             for race_num in range(1, total_race+1):
                 race_key = 'Race {}'.format(race_num)
-                wr.writerow([race_key])
-                wr.writerow((['Match Time:', self.match_content[race_key]['Race Info'][0],
-                              '',
-                              '班次:', self.match_content[race_key]['Race Info'][1],
-                              '',
-                              '跑道:', self.match_content[race_key]['Race Info'][2],
-                              '',
-                              '賽程:', self.match_content[race_key]['Race Info'][3],
-                              ]))
+                race_row = ['' for i in range(11)] + [race_key]
+                wr.writerow(race_row)
 
-                wr.writerow (['馬號', '王牌', '優先', '檔位', '馬名', '馬齡', '騎師', '練馬師',
+                match_date = self.match_content['match_date']
+                match_course = ''
+                if self.match_content[race_key]['Race Info'][2] == 'ALL WEATHER TRACK':
+                    match_course = '田泥'
+                else:
+                    if self.match_content['match_place'][-1] == 'sha tin':
+                        match_course = '田草'
+                    if self.match_content['match_place'][-1] == 'happy valley':
+                        match_course = '谷草'
+                match_class = self.match_content[race_key]['Race Info'][1]
+                match_distance = self.match_content[race_key]['Race Info'][4]
+                track = self.match_content[race_key]['Race Info'][3]
+
+
+                match_info = ['' for i in range(11)] + ['Match Time:', match_date,
+                                                        '',
+                                                        '班次:', match_class,
+                                                        '',
+                                                        '跑道:', self.match_content[race_key]['Race Info'][2],
+                                                        '',
+                                                        '賽道:', track,
+                                                        '',
+                                                        '賽程:', match_distance,
+                                                        ]
+                wr.writerow(match_info)
+
+                wr.writerow (['日期', '場次', '跑道', '班次', '路程', '賽道', '場地狀況', '預計步速', '預計疊數', '預計跑法', '評分優勢',
+                              '馬號', '王牌', '優先', '檔位', '馬名', '馬齡', '騎師', '練馬師',
                               'last game 1', 'last game 2', 'last game 3', 'last game 4', 'last game 5', 'last game 6',
                               '同路程次數', '同路程冠', '同路程亞', '同路程季', '同路程殿',
                               '上場班次','兩場前班次','三場次班次','升/降班', '上次比賽日', '離上次比賽日數', '狀態'
                               ])
 
+                horse_number = 0 # ensure the hourse number will be in order 1 - 14
+
+
                 for horse_num, horse_detail in self.match_content[race_key]['Race Horse'].items():
-                    horse_row = [horse_num, horse_detail['plus'], horse_detail['star'], horse_detail['draw'], horse_detail['name'], horse_detail['age'], horse_detail['jockey'], horse_detail['trainer']]
-                    for place in horse_detail['last 6 Runs']:
-                        horse_row.append(place)
-                    for result in horse_detail['same distance game result']:
-                        horse_row.append(result)
-                    for i in range(3):
-                        try:
-                            content = horse_detail['game_history_class'][i]
-                            horse_row.append(content)
-                        except:
-                            horse_row.append('No game history')
-                    horse_row.append(horse_detail['class change'])
-                    horse_row.append(horse_detail['last game date'])
-                    horse_row.append(horse_detail['last game date delta'])
-                    horse_row.append(horse_detail['status'])
+                    horse_number += 1
+                    horse_row = [match_date, race_key, match_course, match_class, match_distance, track]
+                    for i in range(5):
+                        horse_row.append('')
+                    if horse_num != horse_number:
+                        horse_row.append(horse_number)
+                    else:
+                        horse_row.extend([horse_num, horse_detail['plus'], horse_detail['star'], horse_detail['draw'], horse_detail['name'], horse_detail['age'], horse_detail['jockey'], horse_detail['trainer']])
+                        for place in horse_detail['last 6 Runs']:
+                            horse_row.append(place)
+                        for result in horse_detail['same distance game result']:
+                            horse_row.append(result)
+                        for i in range(3):
+                            try:
+                                content = horse_detail['game_history_class'][i]
+                                horse_row.append(content)
+                            except:
+                                horse_row.append('No game history')
+                        horse_row.append(horse_detail['class change'])
+                        horse_row.append(horse_detail['last game date'])
+                        horse_row.append(horse_detail['last game date delta'])
+                        horse_row.append(horse_detail['status'])
 
                     wr.writerow(horse_row)
+
+                while horse_number <= 14: # less than 14 horse
+                    horse_row = [match_date, race_key, match_course, match_class, match_distance, track]
+                    for i in range(5):
+                        horse_row.append('')
+                    horse_row.append(horse_number)
+                    wr.writerow(horse_row)
+                    horse_number += 1
+
+
 
                 wr.writerow([])
 

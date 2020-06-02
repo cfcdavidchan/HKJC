@@ -33,6 +33,22 @@ class google_sheet_manager():
 
         return self.all_sheet
 
+    def get_sheet_last_row_number(self, sheet_index):
+        target_sheet = self.worksheets.get_worksheet(sheet_index)
+        a_column = target_sheet.col_values(col=1, value_render_option='FORMULA')
+        return len(a_column)
+
+    def write_at_last_row(self, sheet_index, data):
+        #get into the target sheet
+        target_sheet = self.worksheets.get_worksheet(sheet_index)
+        data.insert(0, [])
+        #get last row number
+        last_row_number = self.get_sheet_last_row_number(sheet_index= sheet_index) + 1
+        #writing the data into the sheet
+        target_sheet.update('A%d'%last_row_number, data, value_input_option='USER_ENTERED')
+
+
+
     def clean_and_write(self, sheet_index, data):
         '''
         :param sheet_index: the indext of the target sheet
@@ -61,7 +77,7 @@ import django
 django.setup()
 
 #from ..HKJC_database.models import Jockey_Info, Trainer_Info, Horse_Info, Match_Result, Jockey_Report
-from HKJC_database.models import Jockey_Info, Jockey_Report, Trainer_Info, Trainer_Report, Match_Result
+from HKJC_database.models import Jockey_Info, Jockey_Report, Trainer_Info, Trainer_Report, Match_Result, Draw_statistics
 #from ..HKJC_database.models import Jockey_Info, Jockey_Report
 
 def get_list_jockey_season_report():
@@ -281,6 +297,18 @@ def get_recent_match():
         data = list(reader)
 
     return data
+
+def get_Drawstatistics():
+    all_draw_data = Draw_statistics.objects.all().values()
+    all_draw_data_list = []
+    for data in all_draw_data:
+        row_data = [data['race_place'], data['distance'], data['course'],
+                    data['draw'], data['number_game'],
+                    data['number_first'], data['number_second'], data['number_third'], data['number_fourth']]
+
+        all_draw_data_list.append(row_data)
+
+    return all_draw_data_list
 
 if __name__ == '__main__':
     #pprint (get_list_trainer_season_report())

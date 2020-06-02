@@ -219,9 +219,15 @@ def google_trainerXjockey(google, sheet_index, rate_type='in place'):
 
 def google_recentmatch(google, sheet_index):
     recent_match_data = helper.get_recent_match()
-    google.clean_and_write(sheet_index=sheet_index, data=recent_match_data)
+    #google.clean_and_write(sheet_index=sheet_index, data=recent_match_data)
+    google.write_at_last_row(sheet_index=sheet_index, data=recent_match_data)
     print('Success to store Recent Match data into Google')
 
+def google_draw(google, sheet_index):
+    draw_data = helper.get_Drawstatistics()
+    header = ['跑道', '路程', '賽道', '檔位', '出賽次數', '冠', '亞', '季', '殿']
+    draw_data.insert(0, header)
+    google.clean_and_write(sheet_index=sheet_index, data=draw_data)
 
 if __name__ == '__main__':
     google = helper.google_sheet_manager(cred_json, worksheet_key)
@@ -231,6 +237,8 @@ if __name__ == '__main__':
     google_trainerXjockey(google, sheet_index= all_sheet['練騎合拍_win'], rate_type= "in win")
     google_trainerXjockey(google, sheet_index= all_sheet['練騎合拍_place'], rate_type= "in place")
     google_recentmatch(google, sheet_index= all_sheet['next_game'])
+    google_draw(google, sheet_index=all_sheet['檔位數據'])
+
 
 
 # format the related shell

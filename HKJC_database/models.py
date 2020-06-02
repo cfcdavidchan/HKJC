@@ -377,3 +377,35 @@ class Match_Result(models.Model):
 
     modified_date = models.DateTimeField(auto_now=True)
 
+class Draw_statistics(models.Model):
+
+    race_place = models.CharField(max_length= 10,
+                                  help_text= "Enter race place"
+                                  )
+
+    distance = models.IntegerField(help_text="Enter the horse number"
+                                        )
+
+    course = models.CharField(max_length= 10,
+                                     help_text= "Enter race course"
+                                     )
+
+    draw = models.IntegerField(help_text="Enter draw"
+                                        )
+
+    number_game = models.IntegerField(help_text="Enter number of game"
+                                      )
+
+    number_first = models.IntegerField(help_text="Enter number of first"
+                                       )
+
+    number_second = models.IntegerField(help_text="Enter number of second"
+                                        )
+
+    number_third = models.IntegerField(help_text="Enter number of third"
+                                       )
+
+    number_fourth = models.IntegerField(help_text="Enter number of fourth"
+                                        )
+
+    modified_date = models.DateTimeField(auto_now=True)

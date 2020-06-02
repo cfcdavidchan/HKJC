@@ -70,6 +70,7 @@ ITEM_PIPELINES = {
     'HKJC_crawler.pipelines.TrainersCrawlerPipeline':300,
     'HKJC_crawler.pipelines.HorseCrawlerPipeline':300,
     'HKJC_crawler.pipelines.MatchCrawlerPipeline':300,
+    'HKJC_crawler.pipelines.DrawstatisticsPipeline':300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

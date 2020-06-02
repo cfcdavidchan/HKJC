@@ -4,8 +4,8 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-from .items import JockeyInfoItem, JockeyReportItem, CourseItem, TrainerInfoItem, TrainerReportItem, HorseInfoItem, HorseReportItem, HorseRankingItem, MatchInfoItem, MatchResultItem
-from HKJC_database.models import Jockey_Info, RacingCourse, Jockey_Report, Trainer_Info, Trainer_Report, Horse_Info, Horse_Report, Horse_Ranking, Match_Info, Match_Result
+from .items import JockeyInfoItem, JockeyReportItem, CourseItem, TrainerInfoItem, TrainerReportItem, HorseInfoItem, HorseReportItem, HorseRankingItem, MatchInfoItem, MatchResultItem, DrawstatisticsItem
+from HKJC_database.models import Jockey_Info, RacingCourse, Jockey_Report, Trainer_Info, Trainer_Report, Horse_Info, Horse_Report, Horse_Ranking, Match_Info, Match_Result, Draw_statistics
 
 class JockeysCrawlerPipeline(object):
     def process_item(self, item, spider):
@@ -184,4 +184,20 @@ class MatchCrawlerPipeline(object):
 
             except Match_Result.DoesNotExist: # save it if any amount is changed/ not exists
                 item.save()
+        return item
+
+class DrawstatisticsPipeline(object):
+    def process_item(self, item, spider):
+        if isinstance(item, DrawstatisticsItem):
+            try:# check whether the
+                draw = Draw_statistics.objects.get(race_place= item['race_place'],
+                                                   distance= item['distance'],
+                                                   course= item['course'],
+                                                   draw= item['draw'])
+                item.id = draw.id
+                item.save
+            except Draw_statistics.DoesNotExist: # save the jockey info if it is not in the db
+                item.save()
+                pass
+
         return item
