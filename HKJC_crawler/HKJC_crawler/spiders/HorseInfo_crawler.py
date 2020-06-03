@@ -18,6 +18,11 @@ class HorseCrawler(scrapy.Spider):
         print ('number of trainer:', len(self.all_trainer_id))
 
     def parse(self, response):
+        # check trainer
+        # trainer_id = 'CAS'
+        # trainer_directory = self.start_urls[0].format(trainer_id)
+        # yield scrapy.Request(trainer_directory, callback=self.trainer_detail)
+
         for trainer in self.all_trainer_id:
             trainer_id = trainer
             print ('\n\n\ntrainer id:', trainer_id)
@@ -49,8 +54,10 @@ class HorseCrawler(scrapy.Spider):
             print (trainer_id)
             print('The Trainer does not has any horses')
             pass
-        #horse_url = 'https://racing.hkjc.com/racing/information/English/Horse/Horse.aspx/?HorseId=HK_2016_A202'
-        #yield scrapy.Request(horse_url, callback=self.parseHorsedetail)
+
+        # #check horse
+        # horse_url = 'https://racing.hkjc.com/racing/information/English/Horse/Horse.aspx/?HorseId=HK_2016_A260'
+        # yield scrapy.Request(horse_url, callback=self.parseHorsedetail)
 
     def parseHorsedetail(self, response):
         # HorseInfoItem field
@@ -60,7 +67,7 @@ class HorseCrawler(scrapy.Spider):
         horseInfo['hkjc_id'] = ''
         horseInfo['origin'] = ''
         horseInfo['age'] = 0
-        horseInfo['trainer'] = ''
+        horseInfo['trainer'] = None
         horseInfo['owner'] = ''
         horseInfo['sire'] = ''
         horseInfo['dam'] = ''
@@ -100,11 +107,15 @@ class HorseCrawler(scrapy.Spider):
             horseInfo['age'] = age
         except:
             pass
-        #trainer
-        trainer_id = response.xpath('//tr/td[text()="Trainer"]/following-sibling::td/following-sibling::td/a/@href').extract_first()
-        hkjc_trainer_api = 'TrainerId='
-        trainer_id = trainer_id[trainer_id.find(hkjc_trainer_api) + len(hkjc_trainer_api):]
-        horseInfo['trainer'] = trainer_id
+        try:
+            #trainer
+            trainer_id = response.xpath('//tr/td[text()="Trainer"]/following-sibling::td/following-sibling::td/a/@href').extract_first()
+            hkjc_trainer_api = 'TrainerId='
+            trainer_id = trainer_id[trainer_id.find(hkjc_trainer_api) + len(hkjc_trainer_api):]
+            horseInfo['trainer'] = trainer_id
+        except:
+            pass
+
         #owner
         try:
             owner = response.xpath('//tr/td[text()="Owner"]/following-sibling::td/following-sibling::td/a/text()').extract_first().strip()

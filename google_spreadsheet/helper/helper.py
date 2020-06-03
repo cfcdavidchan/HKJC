@@ -38,6 +38,16 @@ class google_sheet_manager():
         a_column = target_sheet.col_values(col=1, value_render_option='FORMULA')
         return len(a_column)
 
+    def get_every_row(self, sheet_index):
+        target_sheet = self.worksheets.get_worksheet(sheet_index)
+        all_row_data = []
+        total_row = target_sheet.row_count
+        return target_sheet.get_all_values()
+
+
+
+
+
     def write_at_last_row(self, sheet_index, data):
         #get into the target sheet
         target_sheet = self.worksheets.get_worksheet(sheet_index)
@@ -48,6 +58,10 @@ class google_sheet_manager():
         target_sheet.update('A%d'%last_row_number, data, value_input_option='USER_ENTERED')
 
 
+    def update_cell(self, sheet_index, row, column, data):
+
+        target_sheet = self.worksheets.get_worksheet(sheet_index)
+        target_sheet.update_cell(row= row, col= column, value=data)
 
     def clean_and_write(self, sheet_index, data):
         '''
@@ -77,7 +91,7 @@ import django
 django.setup()
 
 #from ..HKJC_database.models import Jockey_Info, Trainer_Info, Horse_Info, Match_Result, Jockey_Report
-from HKJC_database.models import Jockey_Info, Jockey_Report, Trainer_Info, Trainer_Report, Match_Result, Draw_statistics
+from HKJC_database.models import Jockey_Info, Jockey_Report, Trainer_Info, Trainer_Report, Match_Result, Draw_statistics, Horse_Info
 #from ..HKJC_database.models import Jockey_Info, Jockey_Report
 
 def get_list_jockey_season_report():
@@ -270,6 +284,13 @@ def get_trainerXjockey_rate():
 
     return result_dict, all_trainer_chi_name, all_jockey_chi_name
 
+import string
+def col2num(col):
+    num = 0
+    for c in col:
+        if c in string.ascii_letters:
+            num = num * 26 + (ord(c.upper()) - ord('A')) + 1
+    return num
 
 def excel_column():
     from string import ascii_uppercase
@@ -310,8 +331,58 @@ def get_Drawstatistics():
 
     return all_draw_data_list
 
+def horse_game_result(match_date, race_number, horse_no, horse_chi_name= None):
+    horse_place = None
+    win_odds = None
+    if horse_chi_name != None:
+        try:
+            result = Match_Result.objects.get(match_id__match_date= match_date, match_id__race_number= race_number, horse_no=horse_no, horse_id__chinese_name=horse_chi_name)
+            result = result.__dict__
+            horse_place = result['horse_place']
+            win_odds = result['win_odds']
+        except Match_Result.DoesNotExist:
+            print ('No related data')
+
+        return horse_place, win_odds
+    else:
+        try:
+            result = Match_Result.objects.get(match_id__match_date=match_date, match_id__race_number=race_number, horse_no=horse_no)
+            result = result.__dict__
+            horse_place = result['horse_place']
+            win_odds = result['win_odds']
+        except Match_Result.DoesNotExist:
+            print('No related data')
+
+        return horse_place, win_odds
+
+def get_horse_chi_name_from_match(match_date, race_number, horse_no):
+    horse_chi_name = None
+    try:
+        match_result = Match_Result.objects.get(match_id__match_date=match_date, match_id__race_number=race_number, horse_no=horse_no)
+        horse_id = match_result.horse_id
+    except Match_Result.DoesNotExist:
+        print('No related match')
+        return None
+
+    try:
+        horse = Horse_Info.objects.get(pk= horse_id)
+    except Horse_Info.DoesNotExist:
+        print (horse_id)
+        print('No related horse')
+        return None
+
+    try:
+        horse_chi_name = horse.chinese_name
+    except:
+        pass
+
+    return horse_chi_name
+
 if __name__ == '__main__':
     #pprint (get_list_trainer_season_report())
+    # horse_place, win_odds = horse_game_result(match_date='2020-05-03', race_number=6, horse_no=1, horse_chi_name='理想回報')
+    # print (horse_place, win_odds)
+    #get_horse_chi_name_from_match(match_date='2020-05-03', race_number=6, horse_no=1)
     # result_dict, all_trainer_chi_name, all_jockey_chi_name =  get_trainerXjockey_rate()
     # pprint (result_dict)
     pass

@@ -122,10 +122,14 @@ class TrainersCrawlerPipeline(object):
 class HorseCrawlerPipeline(object):
     def process_item(self, item, spider):
         if isinstance(item, HorseInfoItem):
-            trainer = Trainer_Info.objects.get(hkjc_id=item['trainer'])  # get the foregin key from Jockey_info
-            item['trainer'] = trainer
+            try:
+                trainer = Trainer_Info.objects.get(hkjc_id=item['trainer'])  # get the foregin key from Jockey_info
+                item['trainer'] = trainer
+            except:
+                pass
+
             try:  # check whether the horse data exists data exists in Horse_Info
-                Horse_Info_data = Horse_Info.objects.get(name=item['name'])
+                Horse_Info_data = Horse_Info.objects.get(name=item['hkjc_id'])
                 # if it is exists, update it
                 HorseInfo_Item = item.save(commit=False)
                 HorseInfo_Item.id = Horse_Info_data.id

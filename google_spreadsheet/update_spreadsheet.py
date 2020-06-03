@@ -5,6 +5,8 @@ cred_json = 'HKJC-google-cred.json'
 worksheet_key = '1jrD0x3qlBVELqyqMUDrIIHj0h66RYIlx48JELNd8ERQ'
 from string import ascii_uppercase
 import csv
+from datetime import datetime
+import time
 
 def google_jockey_data(google, sheet_index):
     result = helper.get_list_jockey_season_report()
@@ -229,6 +231,86 @@ def google_draw(google, sheet_index):
     draw_data.insert(0, header)
     google.clean_and_write(sheet_index=sheet_index, data=draw_data)
 
+def google_unpdate_model_record(google, sheet_index, final_odd_column, final_place_column, horse_name_column= None):
+    all_row = google.get_every_row(sheet_index= sheet_index)
+    final_odd_column_number = helper.col2num(final_odd_column)
+    final_place_column_number = helper.col2num(final_place_column)
+
+    match_date = None
+    race_number = None
+    horse_no = None
+    horse_chi_name = None
+
+
+    for row in range(len(all_row)):
+        row_data = all_row[row]
+        row_number = row + 1
+
+        # match date
+        try:
+            match_date = row_data[0]
+            match_date_datetime_object = datetime.strptime(match_date, '%d-%B-%Y')
+            match_date = match_date_datetime_object.strftime("%Y-%m-%d")
+        except:
+            match_date = None
+            continue
+
+        # race number
+        try:
+            race_number = row_data[1].lower().replace('race', '')
+            race_number = int(race_number)
+        except:
+            race_number = None
+            continue
+
+        # horse no
+        try:
+            horse_no = row_data[8]
+            horse_no = int(horse_no)
+        except:
+            horse_no = None
+            continue
+
+        # horse chi name
+        try:
+            horse_name = row_data[9]
+            if horse_name == '':
+                horse_chi_name = helper.get_horse_chi_name_from_match(match_date= match_date, race_number= race_number, horse_no= horse_no)
+
+                # filin the horse name
+                if horse_name_column != None:
+                    # row number, column number
+                    # row_number
+                    col_number = helper.col2num(horse_name_column)
+                    print('Update horse name')
+                    google.update_cell(sheet_index, row=row_number, column=col_number, data=horse_chi_name)
+
+            else:
+                horse_chi_name = horse_name
+
+        except Exception as e:
+            horse_chi_name = None
+            continue
+
+        horse_place, win_odds = helper.horse_game_result(match_date=match_date, race_number=race_number, horse_no=horse_no, horse_chi_name= horse_chi_name)
+
+        if (horse_place== None) or (win_odds== None):
+            continue
+        else:
+
+            print('Update horse place')
+            col_number = helper.col2num(final_place_column)
+            google.update_cell(sheet_index, row=row_number, column=col_number, data= horse_place)
+            print('Update horse win odds')
+            col_number = helper.col2num(final_odd_column)
+            google.update_cell(sheet_index, row=row_number, column=col_number, data= win_odds)
+
+        print (match_date, race_number, horse_no, horse_chi_name)
+        if row%50 == 0:
+            time.sleep(100)
+
+
+
 if __name__ == '__main__':
     google = helper.google_sheet_manager(cred_json, worksheet_key)
     all_sheet = google.all_sheet_name_dict()
@@ -238,6 +320,8 @@ if __name__ == '__main__':
     google_trainerXjockey(google, sheet_index= all_sheet['練騎合拍_place'], rate_type= "in place")
     google_recentmatch(google, sheet_index= all_sheet['next_game'])
     google_draw(google, sheet_index=all_sheet['檔位數據'])
+
+    google_unpdate_model_record(google, sheet_index= all_sheet['model'], final_odd_column= 'AI', final_place_column='AO', horse_name_column='J')
 
 
 

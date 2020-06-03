@@ -213,19 +213,23 @@ class Horse_Info(models.Model):
 
     owner = models.CharField(max_length= 100,
                              blank= False,
+                             null=True,
                              help_text="Enter the horse's owner")
 
     sire = models.CharField(max_length= 100,
-                             blank= False,
-                             help_text="Enter the horse's sire")
+                            blank= False,
+                            null=True,
+                            help_text="Enter the horse's sire")
 
     dam = models.CharField(max_length= 100,
-                             blank= False,
-                             help_text="Enter the horse's dam")
+                           blank= False,
+                           null=True,
+                           help_text="Enter the horse's dam")
 
     dam_sire = models.CharField(max_length= 100,
-                                           blank= True,
-                                           help_text="Enter the horse's dam_sire"
+                                blank= True,
+                                null=True,
+                                help_text="Enter the horse's dam_sire"
                                 )
 
     modified_date = models.DateTimeField(auto_now=True)
