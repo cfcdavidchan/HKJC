@@ -4,6 +4,7 @@ from helper import helper # imporrt helper function
 cred_json = 'HKJC-google-cred.json'
 worksheet_key = '1jrD0x3qlBVELqyqMUDrIIHj0h66RYIlx48JELNd8ERQ'
 from string import ascii_uppercase
+from gspread.models import Cell
 import csv
 from datetime import datetime
 import time
@@ -241,7 +242,8 @@ def google_unpdate_model_record(google, sheet_index, final_odd_column, final_pla
     horse_no = None
     horse_chi_name = None
 
-
+    request = 0
+    cells = []
     for row in range(len(all_row)):
         row_data = all_row[row]
         row_number = row + 1
@@ -283,7 +285,7 @@ def google_unpdate_model_record(google, sheet_index, final_odd_column, final_pla
                     # row_number
                     col_number = helper.col2num(horse_name_column)
                     print('Update horse name')
-                    google.update_cell(sheet_index, row=row_number, column=col_number, data=horse_chi_name)
+                    cells.append(Cell(row=row_number, col=col_number, value=horse_chi_name))
 
             else:
                 horse_chi_name = horse_name
@@ -300,14 +302,15 @@ def google_unpdate_model_record(google, sheet_index, final_odd_column, final_pla
 
             print('Update horse place')
             col_number = helper.col2num(final_place_column)
-            google.update_cell(sheet_index, row=row_number, column=col_number, data= horse_place)
+            cells.append(Cell(row=row_number, col=col_number, value=horse_place))
             print('Update horse win odds')
             col_number = helper.col2num(final_odd_column)
-            google.update_cell(sheet_index, row=row_number, column=col_number, data= win_odds)
+            cells.append(Cell(row=row_number, col=col_number, value=win_odds))
+
 
         print (match_date, race_number, horse_no, horse_chi_name)
-        if row%50 == 0:
-            time.sleep(100)
+
+    google.update_multi_cells(sheet_index=sheet_index, data=cells)
 
 
 
@@ -320,8 +323,7 @@ if __name__ == '__main__':
     google_trainerXjockey(google, sheet_index= all_sheet['練騎合拍_place'], rate_type= "in place")
     google_recentmatch(google, sheet_index= all_sheet['next_game'])
     google_draw(google, sheet_index=all_sheet['檔位數據'])
-
-    google_unpdate_model_record(google, sheet_index= all_sheet['model'], final_odd_column= 'AI', final_place_column='AO', horse_name_column='J')
+    google_unpdate_model_record(google, sheet_index= all_sheet['模型'], final_odd_column= 'AI', final_place_column='AO', horse_name_column='J')
 
 
 

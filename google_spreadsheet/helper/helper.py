@@ -63,6 +63,18 @@ class google_sheet_manager():
         target_sheet = self.worksheets.get_worksheet(sheet_index)
         target_sheet.update_cell(row= row, col= column, value=data)
 
+    def update_multi_cells(self,sheet_index, data):
+        '''
+
+        :param sheet_index:
+        :param data: Cell Object from gspread.models
+        :return:
+        '''
+
+        target_sheet = self.worksheets.get_worksheet(sheet_index)
+        print (data)
+        target_sheet.update_cells(data)
+
     def clean_and_write(self, sheet_index, data):
         '''
         :param sheet_index: the indext of the target sheet
