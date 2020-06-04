@@ -56,7 +56,7 @@ class HorseCrawler(scrapy.Spider):
             pass
 
         # #check horse
-        # horse_url = 'https://racing.hkjc.com/racing/information/English/Horse/Horse.aspx/?HorseId=HK_2016_A260'
+        # horse_url = 'https://racing.hkjc.com/racing/information/English/Horse/Horse.aspx/?HorseId=HK_2019_D310'
         # yield scrapy.Request(horse_url, callback=self.parseHorsedetail)
 
     def parseHorsedetail(self, response):

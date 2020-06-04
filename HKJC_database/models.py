@@ -244,7 +244,7 @@ class Horse_Info(models.Model):
 class Horse_Report(models.Model):
     horse = models.ForeignKey('Horse_info',
                                related_name= 'horse_info_horse',
-                               on_delete= models.SET_NULL,
+                               on_delete= models.CASCADE,
                                null= True
                                )
 
@@ -268,7 +268,7 @@ class Horse_Report(models.Model):
 class Horse_Ranking(models.Model):
     horse = models.ForeignKey(Horse_Info,
                                related_name= 'horse_ranking_horse',
-                               on_delete= models.SET_NULL,
+                               on_delete= models.CASCADE,
                                null= True
                                )
 

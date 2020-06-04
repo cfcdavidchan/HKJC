@@ -129,13 +129,13 @@ class HorseCrawlerPipeline(object):
                 pass
 
             try:  # check whether the horse data exists data exists in Horse_Info
-                Horse_Info_data = Horse_Info.objects.get(name=item['hkjc_id'])
+                Horse_Info_data = Horse_Info.objects.get(hkjc_id=item['hkjc_id'])
                 # if it is exists, update it
                 HorseInfo_Item = item.save(commit=False)
                 HorseInfo_Item.id = Horse_Info_data.id
                 HorseInfo_Item.save()
             except Horse_Info.DoesNotExist: #save it if any amount is changed/ not exists
-                print ('Save Data:')
+                print ('Save Horse_Info Data:')
                 item.save()
 
         if isinstance(item, HorseRankingItem):
