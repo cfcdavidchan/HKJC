@@ -72,7 +72,6 @@ class google_sheet_manager():
         '''
 
         target_sheet = self.worksheets.get_worksheet(sheet_index)
-        print (data)
         target_sheet.update_cells(data)
 
     def clean_and_write(self, sheet_index, data):

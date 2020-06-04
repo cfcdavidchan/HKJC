@@ -317,13 +317,13 @@ def google_unpdate_model_record(google, sheet_index, final_odd_column, final_pla
 if __name__ == '__main__':
     google = helper.google_sheet_manager(cred_json, worksheet_key)
     all_sheet = google.all_sheet_name_dict()
-    # google_jockey_data(google, sheet_index= all_sheet['騎師資料'])
-    # google_trainer_data(google, sheet_index= all_sheet['練馬師資料'])
-    # google_trainerXjockey(google, sheet_index= all_sheet['練騎合拍_win'], rate_type= "in win")
-    # google_trainerXjockey(google, sheet_index= all_sheet['練騎合拍_place'], rate_type= "in place")
-    # google_recentmatch(google, sheet_index= all_sheet['next_game'])
-    # google_draw(google, sheet_index=all_sheet['檔位數據'])
-    google_unpdate_model_record(google, sheet_index= all_sheet['model_backup'], final_odd_column= 'AI', final_place_column='AO', horse_name_column='J')
+    google_jockey_data(google, sheet_index= all_sheet['騎師資料'])
+    google_trainer_data(google, sheet_index= all_sheet['練馬師資料'])
+    google_trainerXjockey(google, sheet_index= all_sheet['練騎合拍_win'], rate_type= "in win")
+    google_trainerXjockey(google, sheet_index= all_sheet['練騎合拍_place'], rate_type= "in place")
+    google_recentmatch(google, sheet_index= all_sheet['next_game'])
+    google_draw(google, sheet_index=all_sheet['檔位數據'])
+    google_unpdate_model_record(google, sheet_index= all_sheet['模型'], final_odd_column= 'AI', final_place_column='AO', horse_name_column='J')
 
 
 
