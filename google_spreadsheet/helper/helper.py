@@ -53,7 +53,7 @@ class google_sheet_manager():
         target_sheet = self.worksheets.get_worksheet(sheet_index)
         data.insert(0, [])
         #get last row number
-        last_row_number = self.get_sheet_last_row_number(sheet_index= sheet_index) + 1
+        last_row_number = self.get_sheet_last_row_number(sheet_index= sheet_index)
         #writing the data into the sheet
         target_sheet.update('A%d'%last_row_number, data, value_input_option='USER_ENTERED')
 

@@ -189,12 +189,12 @@ class RecentMatchSpider(scrapy.Spider):
             wr = csv.writer(recent_csv, quoting=csv.QUOTE_ALL)
             heeder_row = ['' for i in range(11)]
             heeder_row += ['Match Date:', self.match_content['match_date'],'','Match Place:', self.match_content['match_place']]
-            wr.writerow(heeder_row)
-            wr.writerow([])
+            #wr.writerow(heeder_row)
+            #wr.writerow([])
             for race_num in range(1, total_race+1):
                 race_key = 'Race {}'.format(race_num)
                 race_row = ['' for i in range(11)] + [race_key]
-                wr.writerow(race_row)
+                #wr.writerow(race_row)
 
                 match_date = self.match_content['match_date']
                 match_course = ''
@@ -220,7 +220,7 @@ class RecentMatchSpider(scrapy.Spider):
                                                         '',
                                                         '賽程:', match_distance,
                                                         ]
-                wr.writerow(match_info)
+                #wr.writerow(match_info)
 
                 wr.writerow (['日期', '場次', '跑道', '班次', '路程', '賽道', '場地狀況', '預計步速', '預計疊數', '預計跑法', '評分優勢',
                               '馬號', '王牌', '優先', '檔位', '馬名', '馬齡', '騎師', '練馬師',
@@ -268,7 +268,7 @@ class RecentMatchSpider(scrapy.Spider):
 
 
 
-                wr.writerow([])
+                #wr.writerow([])
 
 
 
