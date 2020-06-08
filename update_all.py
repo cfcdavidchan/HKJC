@@ -29,6 +29,10 @@ def crawl_RecentMatch():
     commnad = 'python -c "import crawler;crawler.crawl_RecentMatch()"'
     subprocess.Popen(commnad, shell=True, cwd=crawler_path, executable="/bin/bash").wait()
 
+def crawl_Draw():
+    commnad = 'python -c "import crawler;crawler.crawl_Draw()"'
+    subprocess.Popen(commnad, shell=True, cwd=crawler_path, executable="/bin/bash").wait()
+
 if __name__ == '__main__':
     crawl_Trainer()
     print ('Finish Crawl Trainers')
@@ -39,7 +43,9 @@ if __name__ == '__main__':
     crawl_Match()
     print('Finish Crawl Match')
     crawl_RecentMatch()
-    print('Finish Crawl crawl_RecentMatch')
+    print('Finish Crawl RecentMatch')
+    crawl_Draw()
+    print('Finish Crawl Draw')
 
     path = os.getcwd()
     project_path = os.getcwd()
