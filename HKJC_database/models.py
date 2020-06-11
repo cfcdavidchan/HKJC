@@ -378,13 +378,17 @@ class Match_Result(models.Model):
 
     win_odds = models.FloatField(help_text="Enter the win odds"
                                  )
+    place_odds = models.FloatField(help_text="Enter the place odds",
+                                   blank = True,
+                                   null=True
+                                   )
 
     modified_date = models.DateTimeField(auto_now=True)
 
 class Draw_statistics(models.Model):
 
     race_place = models.CharField(max_length= 10,
-                                  help_text= "Enter race place"
+                                  help_text= "Enter race place",
                                   )
 
     distance = models.IntegerField(help_text="Enter the horse number"

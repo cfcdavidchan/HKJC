@@ -8,6 +8,7 @@ from gspread.models import Cell
 import csv
 from datetime import datetime
 import time
+import re
 
 def google_jockey_data(google, sheet_index):
     result = helper.get_list_jockey_season_report()
@@ -232,17 +233,15 @@ def google_draw(google, sheet_index):
     draw_data.insert(0, header)
     google.clean_and_write(sheet_index=sheet_index, data=draw_data)
 
-def google_unpdate_model_record(google, sheet_index, final_odd_column, final_place_column, horse_name_column= None):
+def google_unpdate_model_record(google, sheet_index, final_odd_column, place_odd_column, final_place_column, horse_name_column= None):
     all_row = google.get_every_row(sheet_index= sheet_index)
-    final_odd_column_number = helper.col2num(final_odd_column)
-    final_place_column_number = helper.col2num(final_place_column)
 
+    #Django filter require
     match_date = None
     race_number = None
     horse_no = None
     horse_chi_name = None
 
-    request = 0
     cells = []
     for row in range(len(all_row)):
         row_data = all_row[row]
@@ -294,19 +293,21 @@ def google_unpdate_model_record(google, sheet_index, final_odd_column, final_pla
             horse_chi_name = None
             continue
 
-        horse_place, win_odds = helper.horse_game_result(match_date=match_date, race_number=race_number, horse_no=horse_no, horse_chi_name= horse_chi_name)
+        horse_place, win_odds, place_odds = helper.horse_game_result(match_date=match_date, race_number=race_number, horse_no=horse_no, horse_chi_name= horse_chi_name)
 
         if (horse_place== None) or (win_odds== None):
             continue
         else:
-
+            horse_place = re.sub('[^0-9]+', '', horse_place)
             print('Update horse place')
             col_number = helper.col2num(final_place_column)
             cells.append(Cell(row=row_number, col=col_number, value=horse_place))
             print('Update horse win odds')
             col_number = helper.col2num(final_odd_column)
             cells.append(Cell(row=row_number, col=col_number, value=win_odds))
-
+            print('Update horse win odds')
+            col_number = helper.col2num(place_odd_column)
+            cells.append(Cell(row=row_number, col=col_number, value=place_odds))
 
         print (match_date, race_number, horse_no, horse_chi_name)
 
@@ -323,7 +324,7 @@ if __name__ == '__main__':
     google_trainerXjockey(google, sheet_index= all_sheet['練騎合拍_place'], rate_type= "in place")
     google_recentmatch(google, sheet_index= all_sheet['next_game'])
     google_draw(google, sheet_index=all_sheet['檔位數據'])
-    google_unpdate_model_record(google, sheet_index= all_sheet['模型'], final_odd_column= 'AI', final_place_column='AO', horse_name_column='J')
+    google_unpdate_model_record(google, sheet_index= all_sheet['模型'], final_odd_column= 'AI', place_odd_column='AJ', final_place_column='AO', horse_name_column='J')
 
 
 

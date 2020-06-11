@@ -27,9 +27,9 @@ class HorseCrawler(scrapy.Spider):
             testing = requests.get(match_url).content
             if b'Cookies must be enabled in order to view this page.' not in testing:
                 yield scrapy.Request (match_url, callback=self.match_race_number)
-        ## testing ##
 
-        #match_url = 'https://racing.hkjc.com/racing/information/english/Racing/LocalResults.aspx/?RaceDate=' + match_date_list[1]
+        # # testing ##
+        # match_url = 'https://racing.hkjc.com/racing/information/english/Racing/LocalResults.aspx/?RaceDate=' + match_date_list[1]
         # match_url = 'https://racing.hkjc.com/racing/information/english/Racing/LocalResults.aspx/?RaceDate=2019/04/24'
         # yield scrapy.Request(match_url, callback=self.match_race_number)
 
@@ -131,10 +131,34 @@ class HorseCrawler(scrapy.Spider):
         match = Match_Info.objects.get(match_date= match_date,
                                        race_number= race_number
                                        )
+
+
+        #place table
+        all_place = {i:0.0 for i in range(1,15)}
+        try:
+            dividend_table = response.xpath('//div[contains(@class, "dividend_tab f_clear")]/table/tbody/tr').extract()
+            win_number = response.xpath('//div[contains(@class, "dividend_tab f_clear")]/table/tbody/tr/td[text()="WIN"]/@rowspan').extract_first()
+            number_place = response.xpath('//div[contains(@class, "dividend_tab f_clear")]/table/tbody/tr/td[text()="PLACE"]/@rowspan').extract_first()
+
+            for i in range(int(win_number), int(number_place)+1):
+                place_detail = dividend_table[i]
+                place_soup = BeautifulSoup(place_detail, "html.parser")
+                place_horse = place_soup.find('td',class_="f_fs14").get_text()
+                place_odd = place_soup.find('td',class_ ="f_fs14 f_tar").get_text()
+                try:
+                    place_horse = int(place_horse.strip())
+                    place_odd = float(place_odd.strip())/10
+                    all_place[place_horse] = place_odd
+                except:
+                    continue
+        except:
+            pass
+
         #result_table
         result_table = response.xpath('//div[contains(@class, "performance")]').extract_first()
         result_table = BeautifulSoup(result_table, "html.parser")
         result_table = result_table.find_all('tr')[1:]
+
 
         # loop the table
         for result_row in result_table:
@@ -152,7 +176,7 @@ class HorseCrawler(scrapy.Spider):
             match_result['draw'] = 0
             match_result['finish_time'] = ''
             match_result['win_odds'] = 0.0
-
+            match_result['place_odds'] = 0.0
             #horse_place
             try:
                 horse_place = result[0].get_text()
@@ -232,6 +256,11 @@ class HorseCrawler(scrapy.Spider):
                 match_result['win_odds'] = win_odds
             except:
                 pass
+            try:
 
+                place_odds = all_place[horse_no]
+                match_result['place_odds'] = place_odds
+            except:
+                pass
             yield match_result
 
