@@ -198,7 +198,7 @@ class RecentMatchSpider(scrapy.Spider):
 
                 match_date = self.match_content['match_date']
                 match_course = ''
-                if self.match_content[race_key]['Race Info'][2] == 'ALL WEATHER TRACK':
+                if self.match_content[race_key]['Race Info'][2] == 'ALL WEATHER TRACK'.lower():
                     match_course = '田泥'
                 else:
                     if self.match_content['match_place'][-1] == 'sha tin':
