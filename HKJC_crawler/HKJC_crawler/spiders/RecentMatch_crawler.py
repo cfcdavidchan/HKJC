@@ -109,73 +109,107 @@ class RecentMatchSpider(scrapy.Spider):
             self.match_content[race_number]['Race Horse'][Horse_number] = dict()
             self.match_content[race_number]['Race Horse'][Horse_number]['draw'] = horse_draw
 
-            #star or plus
-            star = False
-            plus = False
-             #get all horse image
-            imgs = horse[0].findAll('img')
-            for img in imgs:
-                src = img['src']
-                if 'star' in src:
-                    star = True
-                if 'plus' in src:
-                    plus = True
 
+            #star or plus
+            try:
+                star = False
+                plus = False
+                 #get all horse image
+                imgs = horse[0].findAll('img')
+                for img in imgs:
+                    src = img['src']
+                    if 'star' in src:
+                        star = True
+                    if 'plus' in src:
+                        plus = True
+            except:
+                star = None
+                plus = None
             self.match_content[race_number]['Race Horse'][Horse_number]['star'] = star
             self.match_content[race_number]['Race Horse'][Horse_number]['plus'] = plus
 
             # Horse Name, Horse Chi Name
-            horse_name = horse[3].get_text().strip()
-            horse_chi_name = get_horse_chi_name(horse_name)
-            horse_horse_age = get_horse_age(horse_name)
+            try:
+                horse_name = horse[3].get_text().strip()
+                horse_chi_name = get_horse_chi_name(horse_name)
+                horse_horse_age = get_horse_age(horse_name)
+            except:
+                horse_chi_name = None
+                horse_horse_age = None
             self.match_content[race_number]['Race Horse'][Horse_number]['name'] = horse_chi_name
             self.match_content[race_number]['Race Horse'][Horse_number]['age'] = horse_horse_age
+
             #jockey
-            jockey_name = horse[7].get_text().strip()
-            if jockey_name.find('(') > 0: #jockey has (-XX)
-                jockey_name = jockey_name[:jockey_name.find('(')].strip()
-            jockey_chi_name = get_jockey_chi_name(jockey_name)
+            try:
+                jockey_name = horse[7].get_text().strip()
+                if jockey_name.find('(') > 0: #jockey has (-XX)
+                    jockey_name = jockey_name[:jockey_name.find('(')].strip()
+                jockey_chi_name = get_jockey_chi_name(jockey_name)
+            except:
+                jockey_chi_name = None
             self.match_content[race_number]['Race Horse'][Horse_number]['jockey'] = jockey_chi_name
 
             # trainer
-            trainer_name = horse[8].get_text().strip()
-            trainer_chi_name = get_trainer_chi_name(trainer_name)
+            try:
+                trainer_name = horse[8].get_text().strip()
+                trainer_chi_name = get_trainer_chi_name(trainer_name)
+            except:
+                trainer_chi_name = None
             self.match_content[race_number]['Race Horse'][Horse_number]['trainer'] = trainer_chi_name
 
             ###
-            horse_game_history = get_horse_game_history(horse_name)
+            try:
+                horse_game_history = get_horse_game_history(horse_name)
+            except:
+                horse_game_history = None
             ###
             # 'last 6 Runs'
-            all_place = []
-            for game in horse_game_history:  # loop all the match
-                try:
-                    place = int(game[1])
-                except ValueError:
-                    place = 7  # name as 7 if no place
-                all_place.append(place)
+            try:
+                all_place = []
+                for game in horse_game_history:  # loop all the match
+                    try:
+                        place = int(game[1])
+                    except ValueError:
+                        place = 7  # name as 7 if no place
+                    all_place.append(place)
 
-            while len(all_place) < 6:  # if not enough 6 past game
-                all_place.append(7)  # name as 7 for that match
+                while len(all_place) < 6:  # if not enough 6 past game
+                    all_place.append(7)  # name as 7 for that match
 
-            last_6_place = all_place[:6]
+                last_6_place = all_place[:6]
+            except:
+                last_6_place = []
             self.match_content[race_number]['Race Horse'][Horse_number]['last 6 Runs'] = last_6_place
 
             # 'same distance game result'
-            same_distance = get_result_by_distance(horse_game_history, int(race_distance), self.match_place[-1], self.match_content[race_number]['Race Info'][2])
+            try:
+                same_distance = get_result_by_distance(horse_game_history, int(race_distance), self.match_place[-1], self.match_content[race_number]['Race Info'][2])
+            except:
+                same_distance = []
             self.match_content[race_number]['Race Horse'][Horse_number]['same distance game result'] = same_distance
 
             # class change
-            game_history_class, class_change = get_class_change(horse_game_history, race_class)
+            try:
+                game_history_class, class_change = get_class_change(horse_game_history, race_class)
+            except:
+                class_change = None
+                game_history_class = None
             self.match_content[race_number]['Race Horse'][Horse_number]['class change'] = class_change
             self.match_content[race_number]['Race Horse'][Horse_number]['game_history_class'] = game_history_class
 
 
             # last game date
-            last_game_date, last_game_days_delta, status = get_hourse_condition(horse_game_history, self.match_date)
+            try:
+                last_game_date, last_game_days_delta, status = get_hourse_condition(horse_game_history, self.match_date)
+            except:
+                last_game_date = None
+                last_game_days_delta = None
+                status = None
             self.match_content[race_number]['Race Horse'][Horse_number]['last game date'] = last_game_date
             self.match_content[race_number]['Race Horse'][Horse_number]['last game date delta'] = last_game_days_delta
             self.match_content[race_number]['Race Horse'][Horse_number]['status'] = status
-
+        print (race_number)
+        print (self.match_content[race_number])
 
 
     def closed(self, reason):
@@ -237,24 +271,26 @@ class RecentMatchSpider(scrapy.Spider):
                     horse_row = [match_date, race_key, match_course, match_class, match_distance, track]
                     for i in range(5):
                         horse_row.append('')
-                    if horse_num != horse_number:
-                        horse_row.append(horse_number)
-                    else:
-                        horse_row.extend([horse_num, horse_detail['plus'], horse_detail['star'], horse_detail['draw'], horse_detail['name'], horse_detail['age'], horse_detail['jockey'], horse_detail['trainer']])
-                        for place in horse_detail['last 6 Runs']:
-                            horse_row.append(place)
-                        for result in horse_detail['same distance game result']:
-                            horse_row.append(result)
-                        for i in range(3):
-                            try:
-                                content = horse_detail['game_history_class'][i]
-                                horse_row.append(content)
-                            except:
-                                horse_row.append('No game history')
-                        horse_row.append(horse_detail['class change'])
-                        horse_row.append(horse_detail['last game date'])
-                        horse_row.append(horse_detail['last game date delta'])
-                        horse_row.append(horse_detail['status'])
+                    # if horse_num != horse_number:
+                    #     horse_row.append(horse_number)
+                    # else:
+                    horse_row.extend([horse_num, horse_detail['plus'], horse_detail['star'], horse_detail['draw'], horse_detail['name'], horse_detail['age'], horse_detail['jockey'], horse_detail['trainer']])
+                    for place in horse_detail['last 6 Runs']:
+                        horse_row.append(place)
+                    for result in horse_detail['same distance game result']:
+                        horse_row.append(result)
+                    for i in range(3):
+                        try:
+                            content = horse_detail['game_history_class'][i]
+                            horse_row.append(content)
+                        except:
+                            horse_row.append('No game history')
+                    horse_row.append(horse_detail['class change'])
+                    horse_row.append(horse_detail['last game date'])
+                    horse_row.append(horse_detail['last game date delta'])
+                    horse_row.append(horse_detail['status'])
+
+
 
                     wr.writerow(horse_row)
 

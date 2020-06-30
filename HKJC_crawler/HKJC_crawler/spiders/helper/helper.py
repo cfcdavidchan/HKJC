@@ -115,11 +115,11 @@ def get_result_by_distance(list_game_game_history, race_distance, match_place, t
 
         for race_range, distance_list in distance_range_dict[match_place.lower()][track.lower()].items():
             if race_distance in distance_list:
-                print(race_range)
+                #print(race_range)
                 return distance_list
 
     distance_list = distance_range(match_place, race_distance, track)
-    print (list_game_game_history)
+    #print (list_game_game_history)
     number_of_game = 0
     number_of_first = 0
     number_of_second = 0
