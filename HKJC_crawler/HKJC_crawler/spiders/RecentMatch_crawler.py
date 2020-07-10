@@ -271,8 +271,14 @@ class RecentMatchSpider(scrapy.Spider):
                     horse_row = [match_date, race_key, match_course, match_class, match_distance, track]
                     for i in range(5):
                         horse_row.append('')
-                    # if horse_num != horse_number:
-                    #     horse_row.append(horse_number)
+                    if horse_num != horse_number:
+                        horse_row.append(horse_number)
+                        wr.writerow(horse_row)
+                        #reset
+                        horse_row = [match_date, race_key, match_course, match_class, match_distance, track]
+                        for i in range(5):
+                            horse_row.append('')
+                        horse_number = horse_num
                     # else:
                     horse_row.extend([horse_num, horse_detail['plus'], horse_detail['star'], horse_detail['draw'], horse_detail['name'], horse_detail['age'], horse_detail['jockey'], horse_detail['trainer']])
                     for place in horse_detail['last 6 Runs']:
