@@ -34,7 +34,7 @@ def crawl_Match():
 
 def crawl_RecentMatch():
     process = CrawlerProcess(get_project_settings())
-    process.crawl('RecentMatch_crawler')
+    process.crawl('RecentMatch_crawler_v2')
     process.start()
 
 def crawl_Draw():

@@ -47,7 +47,6 @@ if __name__ == '__main__':
     crawl_Draw()
     print('Finish Crawl Draw')
 
-    path = os.getcwd()
     project_path = os.getcwd()
     google_spreadsheet_path = os.path.join(project_path, 'google_spreadsheet')
     commnad = 'python update_spreadsheet.py'

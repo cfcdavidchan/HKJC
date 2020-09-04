@@ -79,13 +79,13 @@ def get_horse_game_history(horse_name):
     return game_history
 
 
-def get_result_by_distance(list_game_game_history, race_distance, match_place, track):
+def get_result_by_distance(list_game_game_history, race_distance, match_place, race_course):
     '''
     :param list_game_game_history: [[match_date, place, distance of game], ...]
     :return: [number of game, number of No.1, number of No.2, number of No.3, number of No.4]
     '''
 
-    def distance_range(match_place, race_distance, track):
+    def distance_range(match_place, race_distance, race_course):
         '''
         :param match_place: sha tin or happy valley
         :param race_distance: int()
@@ -113,12 +113,12 @@ def get_result_by_distance(list_game_game_history, race_distance, match_place, t
                                     }
                                }
 
-        for race_range, distance_list in distance_range_dict[match_place.lower()][track.lower()].items():
+        for race_range, distance_list in distance_range_dict[match_place.lower()][race_course.lower()].items():
             if race_distance in distance_list:
                 #print(race_range)
                 return distance_list
 
-    distance_list = distance_range(match_place, race_distance, track)
+    distance_list = distance_range(match_place, race_distance, race_course)
     #print (list_game_game_history)
     number_of_game = 0
     number_of_first = 0

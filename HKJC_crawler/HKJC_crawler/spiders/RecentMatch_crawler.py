@@ -225,11 +225,14 @@ class RecentMatchSpider(scrapy.Spider):
             heeder_row += ['Match Date:', self.match_content['match_date'],'','Match Place:', self.match_content['match_place']]
             #wr.writerow(heeder_row)
             #wr.writerow([])
+            print (self.match_content)
             for race_num in range(1, total_race+1):
                 race_key = 'Race {}'.format(race_num)
                 race_row = ['' for i in range(11)] + [race_key]
                 #wr.writerow(race_row)
-
+                print ('\n\n\n')
+                print (race_key)
+                print (self.match_content[race_key])
                 match_date = self.match_content['match_date']
                 match_course = ''
                 if self.match_content[race_key]['Race Info'][2] == 'ALL WEATHER TRACK'.lower():
