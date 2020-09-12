@@ -54,7 +54,7 @@ def get_trainer_chi_name(trainer_english_name):
 def get_horse_game_history(horse_name):
     '''
     :param horse_name:
-    :return:  [[match_date, place, distance of game, class of the game]]
+    :return:  [[match_date, place, distance of game, game_place, class of the game, game_course]]
     '''
     game_history = []
     try:
@@ -67,7 +67,8 @@ def get_horse_game_history(horse_name):
             race_distance = result.match.distance_M
             game_class = result.match.match_class
             game_place = result.match.match_place
-            game_data = [match_date, place, race_distance,game_place,game_class]
+            game_course = result.match.match_course
+            game_data = [match_date, place, race_distance, game_place, game_class, game_course]
 
             game_history.append(game_data)
     except:
@@ -127,7 +128,7 @@ def get_result_by_distance(list_game_game_history, race_distance, match_place, r
     number_of_fourth = 0
 
     for game_result in list_game_game_history: #loop over the game result
-        if game_result[2] in distance_list and game_result[-2] == match_place: #if the game result is equal to target distance
+        if (game_result[2] in distance_list) and (game_result[3] == match_place) and (race_course.lower() in game_result[5]): #if the game result is equal to target distance
             number_of_game +=1
             try: #check whether it has result of the game
                 place = int(game_result[1])
@@ -152,7 +153,7 @@ def get_class_change(game_history, current_class):
         class_change = 'unknown'
         return game_class_history, class_change
     else:
-        game_class_history = [game[-1] for game in game_history]
+        game_class_history = [game[4] for game in game_history]
 
     if len(game_class_history) > 3:
         game_class_history = game_class_history[:3]
