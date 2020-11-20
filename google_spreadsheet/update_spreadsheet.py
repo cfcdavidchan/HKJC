@@ -250,7 +250,7 @@ def google_unpdate_model_record(google, sheet_index, final_odd_column, place_odd
         # match date
         try:
             match_date = row_data[0]
-            match_date_datetime_object = datetime.strptime(match_date, '%d-%B-%Y')
+            match_date_datetime_object = datetime.strptime(match_date, '%d-%b-%Y')
             match_date = match_date_datetime_object.strftime("%Y-%m-%d")
         except:
             match_date = None
@@ -324,7 +324,7 @@ if __name__ == '__main__':
     google_trainerXjockey(google, sheet_index= all_sheet['練騎合拍_place'], rate_type= "in place")
     google_recentmatch(google, sheet_index= all_sheet['next_game'])
     google_draw(google, sheet_index=all_sheet['檔位數據'])
-    google_unpdate_model_record(google, sheet_index= all_sheet['模型'], final_odd_column= 'AI', place_odd_column='AJ', final_place_column='AO', horse_name_column='J')
+    google_unpdate_model_record(google, sheet_index= all_sheet['模型'], final_odd_column= 'AM', place_odd_column='AN', final_place_column='AR', horse_name_column='J')
 
 
 
