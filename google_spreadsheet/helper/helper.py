@@ -343,7 +343,7 @@ def get_Drawstatistics():
     return all_draw_data_list
 
 def horse_game_result(match_date, race_number, horse_no, horse_chi_name= None):
-    horse_place = None
+    horse_place = 0
     win_odds = None
     place_odds = None
     if horse_chi_name != None:
