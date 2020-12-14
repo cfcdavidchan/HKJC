@@ -350,7 +350,7 @@ def horse_game_result(match_date, race_number, horse_no, horse_chi_name= None):
         try:
             result = Match_Result.objects.get(match_id__match_date= match_date, match_id__race_number= race_number, horse_no=horse_no, horse_id__chinese_name=horse_chi_name)
             result = result.__dict__
-            horse_place = result['horse_place']
+            horse_place = int(result['horse_place'])
             win_odds = result['win_odds']
             place_odds = result['place_odds']
         except Match_Result.DoesNotExist:
