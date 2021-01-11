@@ -19,7 +19,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE','HKJC.settings')
 import django
 django.setup()
 
-from HKJC_database.models import Jockey_Info, Trainer_Info, Horse_Info, Match_Result
+from HKJC_database.models import Jockey_Info, Trainer_Info, Horse_Info, Match_Result, Match_Info
 from django.forms.models import model_to_dict
 
 def get_horse_chi_name(horse_english_name):
@@ -215,3 +215,51 @@ def get_hourse_condition(game_history, match_date_str):
 
     return last_game_date_str, delta.days, status
 
+def get_recent_time_record(horse_name="", reference_year= 3, match_place="", distance=0):
+    # test input
+    # match_place = "happy valley"
+    # horse_name = "MAGNETISM"
+    # distance = 2200
+    #get horse id
+    def record_to_seconds(record):
+        mins, seconds = record.split(":")
+        return int(mins) * 60 + float(seconds)
+    try:
+        horse_id = Horse_Info.objects.get(name=horse_name).id
+        #current year
+        current_year = datetime.now().year
+        #all reference year
+        reference_year = [current_year - i for i in range(0,reference_year)]
+        #all related match
+        all_match_id = []
+        for year in reference_year:
+            year_match_id = Match_Info.objects.filter(match_date__contains= year,
+                                                  match_place=match_place,
+                                                  distance_M = distance).values_list('id', flat=True)
+            if len(year_match_id) > 0:
+                for match_id in year_match_id:
+                    all_match_id.append(match_id)
+
+
+
+        all_record_time = []
+        #
+        for match_id in all_match_id:
+            try:
+                match_time_string = Match_Result.objects.get(horse_id= horse_id, match_id= match_id).finish_time
+                time = record_to_seconds(match_time_string)
+                all_record_time.append(time)
+            except Match_Result.DoesNotExist:
+                pass
+
+        if len(all_record_time) == 0:
+            return 0.0
+
+        else:
+            all_record_time = sorted(all_record_time)
+            # return average time
+            return sum(all_record_time)/len(all_record_time)
+    except:
+        return 0.0
+
+print (get_recent_time_record())
