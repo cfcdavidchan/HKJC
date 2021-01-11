@@ -215,7 +215,7 @@ def get_hourse_condition(game_history, match_date_str):
 
     return last_game_date_str, delta.days, status
 
-def get_recent_time_record(horse_name="", reference_year= 3, match_place="", distance=0):
+def get_recent_time_record(horse_name="", reference_year= 3, match_place="", distance=0, race_course=""):
     # test input
     # match_place = "happy valley"
     # horse_name = "MAGNETISM"
@@ -234,8 +234,9 @@ def get_recent_time_record(horse_name="", reference_year= 3, match_place="", dis
         all_match_id = []
         for year in reference_year:
             year_match_id = Match_Info.objects.filter(match_date__contains= year,
-                                                  match_place=match_place,
-                                                  distance_M = distance).values_list('id', flat=True)
+                                                      match_course__contains= race_course,
+                                                      match_place=match_place,
+                                                      distance_M = distance).values_list('id', flat=True)
             if len(year_match_id) > 0:
                 for match_id in year_match_id:
                     all_match_id.append(match_id)

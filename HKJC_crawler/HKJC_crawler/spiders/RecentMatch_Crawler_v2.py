@@ -189,7 +189,7 @@ class RecentMatchSpider(scrapy.Spider):
                 pass
 
             try:
-                average_recent_time = get_recent_time_record(horse_name=horse_eng_name, reference_year= 3, match_place=self.match_place[-1], distance=int(race_distance))
+                average_recent_time = get_recent_time_record(horse_name=horse_eng_name, reference_year= 3, match_place=self.match_place[-1], distance=int(race_distance), race_course= race_course)
                 race_horse_dict[horse_number]['average_record_time'] = average_recent_time
             except:
                 print ("average_recent_time error")
