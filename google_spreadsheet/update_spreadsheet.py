@@ -292,22 +292,25 @@ def google_unpdate_model_record(google, sheet_index, final_odd_column, place_odd
         except Exception as e:
             horse_chi_name = None
             continue
+        try:
+            horse_place, win_odds, place_odds = helper.horse_game_result(match_date=match_date, race_number=race_number, horse_no=horse_no, horse_chi_name= horse_chi_name)
 
-        horse_place, win_odds, place_odds = helper.horse_game_result(match_date=match_date, race_number=race_number, horse_no=horse_no, horse_chi_name= horse_chi_name)
+            if (horse_place== None) or (win_odds== None):
+                continue
+            else:
+                #horse_place = re.sub('[^0-9]+', '', horse_place)
+                print('Update horse place')
+                col_number = helper.col2num(final_place_column)
+                cells.append(Cell(row=row_number, col=col_number, value=horse_place))
+                print('Update horse win odds')
+                col_number = helper.col2num(final_odd_column)
+                cells.append(Cell(row=row_number, col=col_number, value=win_odds))
+                print('Update horse win odds')
+                col_number = helper.col2num(place_odd_column)
+                cells.append(Cell(row=row_number, col=col_number, value=place_odds))
 
-        if (horse_place== None) or (win_odds== None):
-            continue
-        else:
-            horse_place = re.sub('[^0-9]+', '', horse_place)
-            print('Update horse place')
-            col_number = helper.col2num(final_place_column)
-            cells.append(Cell(row=row_number, col=col_number, value=horse_place))
-            print('Update horse win odds')
-            col_number = helper.col2num(final_odd_column)
-            cells.append(Cell(row=row_number, col=col_number, value=win_odds))
-            print('Update horse win odds')
-            col_number = helper.col2num(place_odd_column)
-            cells.append(Cell(row=row_number, col=col_number, value=place_odds))
+        except:
+            pass
 
         print (match_date, race_number, horse_no, horse_chi_name)
 
