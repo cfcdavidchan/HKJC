@@ -86,6 +86,7 @@ class RecentMatchSpider(scrapy.Spider):
             race_horse_dict[horse_num]['last game date delta'] =""
             race_horse_dict[horse_num]['status'] = ""
             race_horse_dict[horse_num]['average_record_time'] = 0.0
+            race_horse_dict[horse_num]['best_recent_time'] = 0.0
 
             # crawl all horse data
         all_horse = response.xpath('//div[contains(@class,"bodyMainOddsTable content")]/script[contains(@type,"text/javascript")]').extract_first()
