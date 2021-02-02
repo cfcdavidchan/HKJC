@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import js2xml
 from js2xml.utils.vars import get_vars
 from .helper.helper import get_horse_chi_name, get_jockey_chi_name, get_trainer_chi_name, get_horse_game_history, get_result_by_distance, get_class_change, get_hourse_condition, get_horse_age, get_recent_time_record
-
+import re
 from pprint import pprint
 import csv
 import requests
@@ -13,33 +13,55 @@ import sys
 class RecentMatchSpider(scrapy.Spider):
     name = 'RecentMatch_crawler_v2'
     allowed_domains = ['bet.hkjc.com']
-    start_urls = ['https://bet.hkjc.com/racing/pages/odds_wp.aspx/?lang=ch']
+    start_urls = ['https://bet.hkjc.com/racing/pages/odds_wp.aspx/?lang=en']
     match_content = dict()
 
     def parse(self, response):
-        url = self.start_urls[0]
-        # get match data
-        match_info = response.xpath('//div[@class="mtgInfoDV"]//text()').extract()
-        # get match date
-        self.match_date = match_info[0]
-        self.match_date = self.match_date[:self.match_date.find(',')]
-        self.match_date = datetime.strptime(self.match_date, '%d/%m/%Y')
-        self.match_date = datetime.strftime(self.match_date, '%Y/%m/%d')
+        englist_web= requests.get(self.start_urls[0])
+        englist_web = BeautifulSoup(englist_web.content, 'html.parser')
+
+        try: # try to except the international from the dropdown list
+            select_list = englist_web.find('div', attrs={'class': "raceInfoDropdown"}).find_all('option')
+            # international existing
+            for match in select_list:
+                match = match.text.split(", ")
+                match_date, match_place = match[0], match[1]
+                # match date
+                match_date = datetime.strptime(match_date, '%d/%m/%Y')
+                self.match_date = datetime.strftime(match_date, '%Y/%m/%d')
+                # match place
+                if match_place == "Sha Tin":
+                    self.match_place = ["沙田", "Sha Tin"]
+                    self.venue = "ST"
+                if match_place == "Happy Valley":
+                    self.match_place = ["跑馬地", "happy valley"]
+                    self.venue = "HV"
+                # get number of match, by the full url
+                race_url = 'https://bet.hkjc.com/racing/index.aspx/?lang=en&date={}&venue={}'.format(self.match_date, self.venue)
+                race_soup = requests.get(race_url)
+                race_soup = BeautifulSoup(race_soup.content, 'html.parser')  # Get the English place name
+                self.number_of_match = len(race_soup.findAll('div', id=re.compile("^raceSel\d+")))
+
+        except: # no international race
+            englist_info = englist_web.find('div', attrs={'class': "mtgInfoDV"})
+            englist_info = englist_info.text.split(", ")
+            match_date, match_place = englist_info[0], englist_info[2]
+            # match date
+            match_date = datetime.strptime(match_date, '%d/%m/%Y')
+            self.match_date = datetime.strftime(match_date, '%Y/%m/%d')
+            # match place
+            if match_place == "Sha Tin":
+                self.match_place = ["沙田", "Sha Tin"]
+                self.venue = "ST"
+            if match_place == "Happy Valley":
+                self.match_place = ["跑馬地", "happy valley"]
+                self.venue = "HV"
+            self.number_of_match = len(englist_web.findAll('div', id=re.compile("^raceSel\d+")))
+
         self.match_content['match_date'] = self.match_date
-        # get the chinese match venue
-        self.match_place = [match_info[-1]]
-        # get the english match venue
-        englist_info = requests.get('https://bet.hkjc.com/racing/pages/odds_wp.aspx/?lang=en')
-        englist_info = BeautifulSoup(englist_info.content, 'html.parser') #Get the English place name
-        match_place_eng = englist_info.find('div', attrs={'class': "mtgInfoDV"}).text
-        match_place_eng = match_place_eng.split(',')[-1]
-        match_place_eng = match_place_eng.lower().strip()
-        self.match_place.append(match_place_eng)
         self.match_content['match_place'] = self.match_place
-        # count number of match
-        number_of_match = len(response.xpath('//div[contains(@id, "raceSel")]').extract())
-        for race_number in range(1, number_of_match + 1):
-            match_info_url = 'https://bet.hkjc.com/racing/index.aspx/?lang=en&date={}&raceno={}'.format(self.match_date, race_number)
+        for race_number in range(1, self.number_of_match + 1):
+            match_info_url = 'https://bet.hkjc.com/racing/index.aspx/?lang=en&date={}&venue={}&raceno={}'.format(self.match_date, self.venue, race_number)
             yield scrapy.Request(match_info_url, callback=self.match_detail, meta={'race_number': race_number})
 
     def match_detail(self, response):
