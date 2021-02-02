@@ -327,7 +327,7 @@ if __name__ == '__main__':
     google_trainerXjockey(google, sheet_index= all_sheet['練騎合拍_place'], rate_type= "in place")
     google_recentmatch(google, sheet_index= all_sheet['next_game'])
     google_draw(google, sheet_index=all_sheet['檔位數據'])
-    google_unpdate_model_record(google, sheet_index= all_sheet['模型'], final_odd_column= 'AM', place_odd_column='AN', final_place_column='AR', horse_name_column='J')
+    # google_unpdate_model_record(google, sheet_index= all_sheet['模型'], final_odd_column= 'AM', place_odd_column='AN', final_place_column='AR', horse_name_column='J')
 
 
 

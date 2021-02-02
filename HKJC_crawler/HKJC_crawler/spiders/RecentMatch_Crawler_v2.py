@@ -108,6 +108,7 @@ class RecentMatchSpider(scrapy.Spider):
             race_horse_dict[horse_num]['last game date delta'] =""
             race_horse_dict[horse_num]['status'] = ""
             race_horse_dict[horse_num]['average_record_time'] = 0.0
+            race_horse_dict[horse_num]['best_recent_time'] = 0.0
 
             # crawl all horse data
         all_horse = response.xpath('//div[contains(@class,"bodyMainOddsTable content")]/script[contains(@type,"text/javascript")]').extract_first()
@@ -211,8 +212,9 @@ class RecentMatchSpider(scrapy.Spider):
                 pass
 
             try:
-                average_recent_time = get_recent_time_record(horse_name=horse_eng_name, reference_year= 3, match_place=self.match_place[-1], distance=int(race_distance), race_course= race_course)
+                average_recent_time, best_recent_time = get_recent_time_record(horse_name=horse_eng_name, reference_year= 3, match_place=self.match_place[-1], distance=int(race_distance), race_course= race_course)
                 race_horse_dict[horse_number]['average_record_time'] = average_recent_time
+                race_horse_dict[horse_number]['best_recent_time'] = best_recent_time
             except:
                 print ("average_recent_time error")
                 pass
@@ -259,7 +261,7 @@ class RecentMatchSpider(scrapy.Spider):
                               '馬號', '王牌', '優先', '檔位', '馬名', '馬齡', '騎師', '練馬師',
                               'last game 1', 'last game 2', 'last game 3', 'last game 4', 'last game 5', 'last game 6',
                               '同路程次數', '同路程冠', '同路程亞', '同路程季', '同路程殿',
-                              '上場班次','兩場前班次','三場次班次','升/降班', '上次比賽日', '離上次比賽日數', '狀態', '平均圈速'
+                              '上場班次','兩場前班次','三場次班次','升/降班', '上次比賽日', '離上次比賽日數', '狀態', '平均圈速', '最快時間'
                               ])
                 for horse_num, horse_detail in self.match_content[race_key]['Race Horse'].items():
                     horse_row = [match_date, race_key, match_course, match_class, match_distance, track]
@@ -281,6 +283,7 @@ class RecentMatchSpider(scrapy.Spider):
                     horse_row.append(horse_detail['last game date delta'])
                     horse_row.append(horse_detail['status'])
                     horse_row.append(horse_detail['average_record_time'])
+                    horse_row.append(horse_detail['best_recent_time'])
                     wr.writerow(horse_row)
 
 

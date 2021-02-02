@@ -254,13 +254,13 @@ def get_recent_time_record(horse_name="", reference_year= 3, match_place="", dis
                 pass
 
         if len(all_record_time) == 0:
-            return 0.0
+            return 0.0, 0.0
 
         else:
             all_record_time = sorted(all_record_time)
             # return average time
-            return sum(all_record_time)/len(all_record_time)
+            return sum(all_record_time)/len(all_record_time), min(all_record_time)
     except:
-        return 0.0
+        return 0.0, 0.0
 
 print (get_recent_time_record())
