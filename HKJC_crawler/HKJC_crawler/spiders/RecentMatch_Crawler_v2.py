@@ -31,7 +31,7 @@ class RecentMatchSpider(scrapy.Spider):
                 self.match_date = datetime.strftime(match_date, '%Y/%m/%d')
                 # match place
                 if match_place == "Sha Tin":
-                    self.match_place = ["沙田", "Sha Tin"]
+                    self.match_place = ["沙田", "sha tin"]
                     self.venue = "ST"
                 if match_place == "Happy Valley":
                     self.match_place = ["跑馬地", "happy valley"]
@@ -51,7 +51,7 @@ class RecentMatchSpider(scrapy.Spider):
             self.match_date = datetime.strftime(match_date, '%Y/%m/%d')
             # match place
             if match_place == "Sha Tin":
-                self.match_place = ["沙田", "Sha Tin"]
+                self.match_place = ["沙田", "sha tin"]
                 self.venue = "ST"
             if match_place == "Happy Valley":
                 self.match_place = ["跑馬地", "happy valley"]
