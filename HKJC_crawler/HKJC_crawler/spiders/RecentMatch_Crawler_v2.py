@@ -175,11 +175,16 @@ class RecentMatchSpider(scrapy.Spider):
                     try:
                         place = int(game[1])
                     except ValueError:
-                        place = 7  # name as 7 if no place
+                        place = ""  # empty it if no place
+                        # place = 7  # name as 7 if no place
                     all_place.append(place)
 
                 while len(all_place) < 6:  # if not enough 6 past game
-                    all_place.append(7)  # name as 7 for that match
+                    if len(all_place) == 0:
+                        all_place.append(" ") # empty it if no place
+                    else:
+                        all_place.append(all_place[-1])  # fillin the last game result
+                    # all_place.append(7)  # name as 7 for that match
 
                 race_horse_dict[horse_number]['last 6 Runs'] = all_place[:6]
             except:
