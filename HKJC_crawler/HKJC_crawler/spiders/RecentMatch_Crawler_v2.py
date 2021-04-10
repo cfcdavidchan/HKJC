@@ -33,9 +33,11 @@ class RecentMatchSpider(scrapy.Spider):
                 if match_place == "Sha Tin":
                     self.match_place = ["沙田", "sha tin"]
                     self.venue = "ST"
-                if match_place == "Happy Valley":
+                elif match_place == "Happy Valley":
                     self.match_place = ["跑馬地", "happy valley"]
                     self.venue = "HV"
+                else:
+                    continue
                 # get number of match, by the full url
                 race_url = 'https://bet.hkjc.com/racing/index.aspx/?lang=en&date={}&venue={}'.format(self.match_date, self.venue)
                 race_soup = requests.get(race_url)
